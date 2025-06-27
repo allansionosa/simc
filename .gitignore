@@ -1,41 +1,75 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
-/node_modules
-/.pnp
+# === DEPENDENCIES ===
+node_modules/
+.pnp/
 .pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+.pnpm-store/
 
-# testing
-/coverage
+# === TESTING ===
+coverage/
+jest.config.js
+vitest.config.ts
+*.test.ts
+*.test.tsx
 
-# next.js
-/.next/
-/out/
+# === NEXT.JS ===
+.next/
+out/
+build/
 
-# production
-/build
+# === TURBOPACK (Experimental) ===
+.turbo/
 
-# misc
-.DS_Store
-*.pem
+# === ENV FILES ===
+.env*
+!.env.example
 
-# debug
+# === LOGS & DEBUG FILES ===
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
+pnpm-debug.log*
+.vscode/settings.json
 
-# env files (can opt-in for committing if needed)
-.env*
+# === SYSTEM FILES ===
+.DS_Store
+Thumbs.db
 
-# vercel
-.vercel
-
-# typescript
+# === TYPESCRIPT ===
 *.tsbuildinfo
 next-env.d.ts
+
+# === VERCEL ===
+.vercel/
+
+# === SWC / BABEL ===
+.cache/
+.swc/
+
+# === DOCKER ===
+Dockerfile
+.dockerignore
+
+# === LINT / FORMATTER ===
+.eslintcache
+.prettiercache
+
+# === IDE ===
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# === MISC ===
+*.pem
+*.log
+*.sqlite
+*.tgz
+*.local
+*.bak
