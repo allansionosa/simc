@@ -1,39 +1,25 @@
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import ContactUsForm from '../contact/contact-us-form';
 
-const faqs = [
-  {
-    question: 'This is panel header 1',
-    answer:
-      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laborum suscipit expedita, fugiat ullam voluptatum, odio iusto vel nostrum minima ipsum laudantium dolore alias adipisci quo cupiditate possimus quis. Officia.',
-  },
-  {
-    question: 'This is panel header 2',
-    answer:
-      'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est laborum suscipit expedita, fugiat ullam voluptatum, odio iusto vel nostrum minima ipsum laudantium dolore alias adipisci quo cupiditate possimus quis. Officia.',
-  },
-  {
-    question: 'This is panel header 3',
-    answer: '',
-  },
-  {
-    question: 'This is panel header 4',
-    answer: '',
-  },
-  {
-    question: 'This is panel header 5',
-    answer: '',
-  },
-];
+const getFaqs = async (): Promise<FAQs[]> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/faqs`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
 
-const ContactUs = () => {
+export default async function ContactUs() {
+  const data = await getFaqs();
   return (
     <section className="w-full bg-gradient-to-br from-sky-100 via-sky-200 to-primary py-10 px-2">
       <div className="container mx-auto flex flex-col lg:flex-row gap-10">
@@ -50,24 +36,7 @@ const ContactUs = () => {
             beatae exercitationem maxime excepturi error, iusto enim unde
             distinctio vero atque quisquam voluptate eius!
           </p>
-          <form className="space-y-3">
-            <div className="flex flex-col md:flex-row gap-3">
-              <Input placeholder="First Name" className="flex-1" />
-              <Input placeholder="Last Name" className="flex-1" />
-            </div>
-            <div className="flex flex-col md:flex-row gap-3">
-              <Input placeholder="Email" className="flex-1" />
-              <Input placeholder="Contact Number" className="flex-1" />
-            </div>
-            <Input placeholder="Subject" />
-            <Textarea placeholder="Message" rows={4} />
-            <Button
-              type="submit"
-              className="bg-accent text-white font-medium w-fit"
-            >
-              Send Message
-            </Button>
-          </form>
+          <ContactUsForm />
         </div>
         <div className="flex-1 mx-auto w-full">
           <h3 className="uppercase text-accent font-medium text-sm tracking-widest mb-1 mt-10 lg:mt-0">
@@ -81,13 +50,16 @@ const ContactUs = () => {
             collapsible
             className="w-full rounded-lg bg-white/60"
           >
-            {faqs.map((faq, idx) => (
-              <AccordionItem value={`item-${idx}`} key={idx}>
+            {data.map((faq, id) => (
+              <AccordionItem value={`item-${id}`} key={id}>
                 <AccordionTrigger className="font-medium px-5">
-                  {faq.question}
+                  {faq.title}
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted px-5">
-                  {faq.answer}
+                  <div
+                    className="tiptap-content"
+                    dangerouslySetInnerHTML={{ __html: faq.description }}
+                  />
                 </AccordionContent>
               </AccordionItem>
             ))}
@@ -96,6 +68,4 @@ const ContactUs = () => {
       </div>
     </section>
   );
-};
-
-export default ContactUs;
+}

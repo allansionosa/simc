@@ -15,8 +15,6 @@ const getAbout = async (): Promise<About> => {
 export default async function About() {
   const data = await getAbout();
 
-  console.log(data);
-
   return (
     <section className="relative -z-10 mt-0 lg:mt-20">
       <div className="container mx-auto sm:px-0 px-4 py-10 text-center">
