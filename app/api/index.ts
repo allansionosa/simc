@@ -39,3 +39,11 @@ export const sendHmoApprovalMail = async (
 ): Promise<string> => {
   return await api.post('/api/hmo-approval', payload).then((res) => res.data);
 };
+
+export const JobApplicationMail = async (
+  payload: JobApplication
+): Promise<string> => {
+  return await api
+    .post('/api/job-application', payload)
+    .then((res) => res.data);
+};

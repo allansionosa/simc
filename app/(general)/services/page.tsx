@@ -1,62 +1,10 @@
-import {
-  Syringe,
-  FlaskConical,
-  Bone,
-  Stethoscope,
-  HeartPulse,
-  Scissors,
-} from 'lucide-react';
+import { getServices } from '@/components/hooks/useServices';
 import Image from 'next/image';
 
-const services = [
-  {
-    name: 'Anesthesiology',
-    icon: <Syringe className="w-8 h-8 text-accent mb-2" />,
-    description:
-      'Safe and effective anesthesia care for all types of surgeries and procedures.',
-    image: '/room1.jpg',
-  },
-  {
-    name: 'Laboratory',
-    icon: <FlaskConical className="w-8 h-8 text-accent mb-2" />,
-    description:
-      'Comprehensive laboratory services with state-of-the-art equipment for accurate diagnostics.',
-    image: '/room2.jpg',
-  },
-  {
-    name: 'Orthopedic',
-    icon: <Bone className="w-8 h-8 text-accent mb-2" />,
-    description:
-      'Expert care for bone, joint, and muscle conditions, from diagnosis to rehabilitation.',
-    image: '/room3.jpg',
-  },
-  {
-    name: 'Pediatrics',
-    icon: <Stethoscope className="w-8 h-8 text-accent mb-2" />,
-    description:
-      'Compassionate pediatric care for infants, children, and adolescents.',
-    image: '/room4.jpg',
-  },
-  {
-    name: 'Rehabilitation',
-    icon: <HeartPulse className="w-8 h-8 text-accent mb-2" />,
-    description:
-      'Personalized rehabilitation programs to help patients regain strength and mobility.',
-    image: '/room1.jpg',
-  },
-  {
-    name: 'Surgery',
-    icon: <Scissors className="w-8 h-8 text-accent mb-2" />,
-    description:
-      'Advanced surgical services with a focus on safety, precision, and patient comfort.',
-    image: '/room2.jpg',
-  },
-];
-
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServices();
   return (
     <main className="bg-surface min-h-screen">
-      {/* Hero/Intro */}
       <section className="relative w-full bg-gradient-to-r from-sky-100 via-sky-200 to-white py-12 md:py-20">
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
@@ -89,30 +37,35 @@ export default function ServicesPage() {
       <section className="container mx-auto py-12 px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {services.map((service) => (
-            <div
-              key={service.name}
-              className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center p-6"
+            <a
+              key={service.id}
+              href={`/services/${service.slug}`}
+              className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center p-6 no-underline"
             >
-              {service.icon}
+              <Image
+                src={service.logo}
+                alt={service.title}
+                width={30}
+                height={30}
+              />
               <h3 className="font-heading font-bold text-lg text-primary mb-2">
-                {service.name}
+                {service.title}
               </h3>
               <p className="text-muted text-sm mb-4">{service.description}</p>
               <div className="w-full h-32 relative rounded-lg overflow-hidden">
                 <Image
                   src={service.image}
-                  alt={service.name}
+                  alt={service.title}
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, 300px"
                 />
               </div>
-            </div>
+            </a>
           ))}
         </div>
       </section>
 
-      {/* Call to Action */}
       <section className="bg-accent py-10">
         <div className="container mx-auto text-center">
           <h4 className="font-heading text-2xl text-white mb-2">

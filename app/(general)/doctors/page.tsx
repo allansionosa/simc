@@ -1,50 +1,52 @@
+import { getDoctors } from '@/components/hooks/useDoctor';
 import Image from 'next/image';
 
-const doctors = [
-  {
-    name: 'Dr. Jane Smith',
-    specialty: 'Cardiologist',
-    image: '/doctor1.jpg',
-    description:
-      'Expert in heart health and cardiovascular care with 15+ years of experience.',
-  },
-  {
-    name: 'Dr. John Doe',
-    specialty: 'Pediatrician',
-    image: '/doctor2.jpg',
-    description:
-      'Caring for children and adolescents with a focus on holistic wellness.',
-  },
-  {
-    name: 'Dr. Maria Garcia',
-    specialty: 'Orthopedic Surgeon',
-    image: '/doctor1.jpg',
-    description:
-      'Specialist in bone, joint, and muscle surgery and rehabilitation.',
-  },
-  {
-    name: 'Dr. Alex Lee',
-    specialty: 'Anesthesiologist',
-    image: '/doctor2.jpg',
-    description:
-      'Ensuring patient safety and comfort during surgical procedures.',
-  },
-  {
-    name: 'Dr. Emily Tan',
-    specialty: 'Laboratory Medicine',
-    image: '/doctor1.jpg',
-    description: 'Providing accurate diagnostics and laboratory services.',
-  },
-  {
-    name: 'Dr. Michael Cruz',
-    specialty: 'Rehabilitation Medicine',
-    image: '/doctor2.jpg',
-    description:
-      'Helping patients regain strength and mobility after injury or illness.',
-  },
-];
+// const doctors = [
+//   {
+//     name: 'Dr. Jane Smith',
+//     specialty: 'Cardiologist',
+//     image: '/doctor1.jpg',
+//     description:
+//       'Expert in heart health and cardiovascular care with 15+ years of experience.',
+//   },
+//   {
+//     name: 'Dr. John Doe',
+//     specialty: 'Pediatrician',
+//     image: '/doctor2.jpg',
+//     description:
+//       'Caring for children and adolescents with a focus on holistic wellness.',
+//   },
+//   {
+//     name: 'Dr. Maria Garcia',
+//     specialty: 'Orthopedic Surgeon',
+//     image: '/doctor1.jpg',
+//     description:
+//       'Specialist in bone, joint, and muscle surgery and rehabilitation.',
+//   },
+//   {
+//     name: 'Dr. Alex Lee',
+//     specialty: 'Anesthesiologist',
+//     image: '/doctor2.jpg',
+//     description:
+//       'Ensuring patient safety and comfort during surgical procedures.',
+//   },
+//   {
+//     name: 'Dr. Emily Tan',
+//     specialty: 'Laboratory Medicine',
+//     image: '/doctor1.jpg',
+//     description: 'Providing accurate diagnostics and laboratory services.',
+//   },
+//   {
+//     name: 'Dr. Michael Cruz',
+//     specialty: 'Rehabilitation Medicine',
+//     image: '/doctor2.jpg',
+//     description:
+//       'Helping patients regain strength and mobility after injury or illness.',
+//   },
+// ];
 
-export default function DoctorsPage() {
+export default async function DoctorsPage() {
+  const doctors = await getDoctors();
   return (
     <main className="bg-surface min-h-screen">
       {/* Hero/Intro */}
@@ -101,7 +103,7 @@ export default function DoctorsPage() {
                 {doctor.name}
               </h3>
               <span className="text-accent font-medium mb-2">
-                {doctor.specialty}
+                {doctor.specialties}
               </span>
               <p className="text-muted text-sm mb-4">{doctor.description}</p>
             </div>

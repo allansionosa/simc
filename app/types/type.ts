@@ -111,3 +111,22 @@ type HmoApproval = {
   healthCard: string;
   validId: string;
 };
+
+type Careers = {
+  id: number;
+  title: string;
+  location: string;
+  employmentType: string;
+  description: string;
+  slug: string;
+  is_enabled: boolean;
+};
+
+type JobApplication = {
+  email: string;
+  contactNo: string;
+  jobPosition: string;
+  message: string;
+  attachment: string;
+  fullName: string;
+};

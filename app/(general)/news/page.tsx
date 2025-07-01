@@ -1,45 +1,9 @@
+import { getNews } from '@/components/hooks/useNews';
 import Image from 'next/image';
+import dayjs from 'dayjs';
 
-const newsData = [
-  {
-    image: '/news1.jpg',
-    date: 'Friday 10, February 2023',
-    category: 'News',
-    title: 'Hospital Achieves Top Accreditation',
-    description:
-      'Our hospital has been awarded the highest accreditation for patient safety and quality care.',
-    link: '#',
-  },
-  {
-    image: '/news-image.jpg',
-    date: 'Monday 20, March 2023',
-    category: 'Event',
-    title: 'Free Health Checkup Camp Announced',
-    description:
-      'Join us for a free health checkup camp this weekend. Open to all community members.',
-    link: '#',
-  },
-  {
-    image: '/news-image.jpg',
-    date: 'Wednesday 5, April 2023',
-    category: 'Update',
-    title: 'New Pediatric Wing Opens',
-    description:
-      "We are excited to announce the opening of our new pediatric wing, dedicated to children's health.",
-    link: '#',
-  },
-  {
-    image: '/news-image.jpg',
-    date: 'Friday 21, April 2023',
-    category: 'News',
-    title: 'COVID-19 Vaccination Drive Success',
-    description:
-      'Our recent vaccination drive helped protect over 5,000 community members.',
-    link: '#',
-  },
-];
-
-export default function NewsPage() {
+export default async function NewsPage() {
+  const data = await getNews();
   return (
     <main className="bg-surface min-h-screen">
       {/* Hero/Intro */}
@@ -74,7 +38,7 @@ export default function NewsPage() {
       {/* News Grid */}
       <section className="container mx-auto py-12 px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {newsData.map((news, idx) => (
+          {data.map((news, idx) => (
             <div
               key={idx}
               className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col md:flex-row h-full"
@@ -91,7 +55,8 @@ export default function NewsPage() {
               </div>
               <div className="p-4 flex flex-col flex-1 justify-center">
                 <div className="text-xs text-accent mb-1">
-                  {news.date} | {news.category}
+                  {dayjs(news.addedDate).format('dddd DD, MMMM YYYY')} |{' '}
+                  {news.type}
                 </div>
                 <div className="font-semibold text-primary mb-2 leading-snug">
                   {news.title}
@@ -101,7 +66,7 @@ export default function NewsPage() {
                 </div>
                 <div>
                   <a
-                    href={news.link}
+                    href={`news/${news.slug}`}
                     className="text-accent text-sm font-medium hover:underline"
                   >
                     Learn More

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { getNews } from '../hooks/useNews';
 
 // const newsData = [
 //   {
@@ -31,18 +32,6 @@ import Link from 'next/link';
 //     link: '#',
 //   },
 // ];
-
-const getNews = async (): Promise<News[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/news`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
-};
 
 export default async function News() {
   const data = await getNews();
