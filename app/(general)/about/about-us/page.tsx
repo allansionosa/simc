@@ -1,29 +1,30 @@
 import Image from 'next/image';
 import { HeartPulse, Users, ShieldCheck, Stethoscope } from 'lucide-react';
+import { getAbout } from '@/components/hooks/useAbout';
+import { getDoctors } from '@/components/hooks/useDoctor';
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const data = await getAbout();
+  const doctors = await getDoctors();
   return (
     <main className="bg-surface min-h-screen">
       <section className="relative w-full bg-gradient-to-r from-sky-100 via-sky-200 to-white py-12 md:py-20">
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-accent uppercase font-medium tracking-widest text-base mb-2">
-              Welcome to St. Irenaeus Medical Center Inc.
+              {data.title}
             </h1>
             <h2 className="font-heading text-3xl md:text-5xl text-primary font-bold mb-4">
-              A Great Place to Receive Care
+              {data.subTitle}
             </h2>
             <p className="text-muted text-base md:text-lg mb-6 max-w-xl">
-              St. Irenaeus Medical Center Inc. is a leading provider of medical
-              care in the Philippines. We are dedicated to providing the highest
-              quality medical services to our patients, with compassion,
-              expertise, and a commitment to your well-being.
+              {data.description}
             </p>
           </div>
           <div className="flex-1 flex justify-center">
             <Image
-              src="/room2.jpg"
-              alt="Hospital Room"
+              src={data.image}
+              alt={data.title}
               width={400}
               height={400}
               className="rounded-xl shadow-lg object-cover"
@@ -85,32 +86,21 @@ export default function AboutPage() {
           Meet Our Leadership
         </h3>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
-          <div className="flex flex-col items-center">
-            <Image
-              src="/doctor1.jpg"
-              alt="Dr. Jane Smith"
-              width={120}
-              height={120}
-              className="rounded-full object-cover shadow"
-            />
-            <span className="font-heading font-bold text-primary mt-2">
-              Dr. Jane Smith
-            </span>
-            <span className="text-muted text-sm">Chief Medical Officer</span>
-          </div>
-          <div className="flex flex-col items-center">
-            <Image
-              src="/doctor2.jpg"
-              alt="Dr. John Doe"
-              width={120}
-              height={120}
-              className="rounded-full object-cover shadow"
-            />
-            <span className="font-heading font-bold text-primary mt-2">
-              Dr. John Doe
-            </span>
-            <span className="text-muted text-sm">Hospital Director</span>
-          </div>
+          {doctors.map((doctor, i) => (
+            <div className="flex flex-col items-center" key={i}>
+              <Image
+                src={doctor.image}
+                alt={doctor.name}
+                width={120}
+                height={120}
+                className="rounded-full object-cover shadow"
+              />
+              <span className="font-heading font-bold text-primary mt-2">
+                {doctor.name}
+              </span>
+              <span className="text-muted text-sm">{doctor.specialties}</span>
+            </div>
+          ))}
         </div>
       </section>
 

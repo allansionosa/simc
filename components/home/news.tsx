@@ -80,7 +80,7 @@ export default async function News() {
               </div>
               <div>
                 <Link
-                  href={news.slug}
+                  href={`news/${news.slug}`}
                   className="text-accent text-sm font-medium hover:underline"
                 >
                   Learn More

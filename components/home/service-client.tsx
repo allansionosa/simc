@@ -1,9 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-
-import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function ServiceClient({ data }: { data: Services[] }) {
   const [selected, setSelected] = useState(0);
@@ -75,9 +74,12 @@ export default function ServiceClient({ data }: { data: Services[] }) {
               {data[selected].title} Unit
             </h3>
             <p className="text-black/80 mb-4">{data[selected].description}</p>
-            <Button className="bg-accent text-white font-medium hover:bg-accent/90 w-fit">
+            <Link
+              href={`services/${data[selected].slug}`}
+              className="bg-accent text-white font-medium hover:bg-accent/90 w-fit p-2 rounded-lg text-sm px-4"
+            >
               Learn More
-            </Button>
+            </Link>
           </div>
         </div>
       </div>

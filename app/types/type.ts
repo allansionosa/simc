@@ -21,6 +21,7 @@ type Services = {
   logo: string;
   title: string;
   description: string;
+  slug: string;
 };
 
 type News = {
@@ -46,4 +47,67 @@ type Contact = {
   phone: string;
   subject: string;
   message: string;
+};
+
+type Institution = {
+  id: number;
+  logo: string;
+  logoWhite: string;
+  address: string;
+  facebook: string;
+  emailGeneralInfo: string;
+  emailCareers: string;
+  emailAppointment: string;
+  contactNo: string;
+  addressLink: string;
+};
+
+type CompanyProfile = {
+  id: number;
+  title: string;
+  subTitle: string;
+  description: string;
+  image: string;
+};
+
+type Doctors = {
+  id: number;
+  name: string;
+  image: string;
+  specialties: string;
+  description: string;
+};
+
+type Vision = {
+  id: number;
+  title: string;
+  description: string;
+  image: string;
+};
+
+type Mission = {
+  id: number;
+  title: string;
+  description: string;
+};
+
+type HMO = {
+  id: number;
+  title: string;
+  image: string;
+  contactNo: string;
+  website: string;
+};
+
+type HmoApproval = {
+  firstName: string;
+  middleName: string | null;
+  lastName: string;
+  dateOfBirth: string;
+  email: string;
+  contactNo: string;
+  hmoProvider: string;
+  company: string | null;
+  healthCard: string;
+  validId: string;
 };

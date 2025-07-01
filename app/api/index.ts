@@ -16,6 +16,26 @@ const authorizedConfig = (token: string) => {
   };
 };
 
+export const uploadImage = async (
+  file: FormData,
+  path: string
+): Promise<string> => {
+  return await api
+    .post(`/api/${path}/upload`, file, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Accept: '*/*',
+      },
+    })
+    .then((res) => res.data);
+};
+
 export const sendContactMail = async (payload: Contact): Promise<string> => {
   return await api.post('/api/contact', payload).then((res) => res.data);
+};
+
+export const sendHmoApprovalMail = async (
+  payload: HmoApproval
+): Promise<string> => {
+  return await api.post('/api/hmo-approval', payload).then((res) => res.data);
 };

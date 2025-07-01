@@ -1,9 +1,49 @@
-'use client';
-
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const CompanyProfile = () => {
+export const getCompanyProfile = async (): Promise<CompanyProfile> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/about/company-profile`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
+export const getVision = async (): Promise<Vision> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/vision`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
+export const getMission = async (): Promise<Mission[]> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mission`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
+export default async function CompanyProfile() {
+  const data = await getCompanyProfile();
+  const vision = await getVision();
+  const missions = await getMission();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -11,22 +51,19 @@ const CompanyProfile = () => {
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-accent uppercase font-medium tracking-widest text-base mb-2">
-              St. Irenaeus Medical Center Inc.
+              {data.title}
             </h1>
             <h2 className="font-heading text-3xl md:text-5xl text-primary font-bold mb-4">
-              Coming Soon in 2025
+              {data.subTitle}
             </h2>
             <p className="text-muted text-base md:text-lg mb-6 max-w-xl">
-              We are excited to announce the opening of our state-of-the-art
-              medical center in 2025. Our commitment to excellence in healthcare
-              will bring advanced medical services and compassionate care to our
-              community.
+              {data.description}
             </p>
           </div>
           <div className="flex-1 flex justify-center">
             <Image
-              src="/room2.jpg"
-              alt="Hospital Room"
+              src={data.image}
+              alt={data.title}
               width={400}
               height={400}
               className="rounded-xl shadow-lg object-cover"
@@ -40,20 +77,13 @@ const CompanyProfile = () => {
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl font-bold mb-6 text-primary">Our Vision</h2>
-            <p className="text-gray-600 leading-relaxed mb-6">
-              St. Irenaeus Medical Center Inc. is being established with a
-              vision to provide accessible, high-quality healthcare services to
-              our community. As we prepare for our opening in 2025, we are
-              building a modern facility equipped with the latest medical
-              technology and staffed by experienced healthcare professionals.
-            </p>
-            <p className="text-gray-600 leading-relaxed">
-              Our commitment to patient care, medical innovation, and community
-              service will make us a trusted healthcare provider in the region.
-              We are dedicated to creating a healthcare environment that
-              prioritizes patient comfort and well-being.
-            </p>
+            <h2 className="text-3xl font-bold mb-6 text-primary">
+              {vision.title}
+            </h2>
+            <div
+              className="tiptap-content"
+              dangerouslySetInnerHTML={{ __html: vision.description }}
+            />
           </div>
           <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
             <Image
@@ -73,32 +103,13 @@ const CompanyProfile = () => {
             Our Mission & Values
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: 'Patient-Centered Care',
-                description:
-                  "We will put our patients' needs first, providing personalized healthcare solutions with compassion and understanding.",
-                icon: '🏥',
-              },
-              {
-                title: 'Medical Excellence',
-                description:
-                  'We are committed to maintaining the highest standards of medical care through advanced technology and expert professionals.',
-                icon: '⭐',
-              },
-              {
-                title: 'Community Service',
-                description:
-                  'We will serve our community with dedication, focusing on improving public health and accessibility to quality healthcare.',
-                icon: '🤝',
-              },
-            ].map((value, index) => (
+            {missions.map((value) => (
               <Card
-                key={index}
+                key={value.id}
                 className="hover:shadow-lg transition-shadow duration-300"
               >
                 <CardHeader>
-                  <div className="text-4xl mb-4">{value.icon}</div>
+                  {/* <div className="text-4xl mb-4">{value.icon}</div> */}
                   <CardTitle className="text-xl text-primary">
                     {value.title}
                   </CardTitle>
@@ -115,7 +126,7 @@ const CompanyProfile = () => {
       {/* Facilities Section */}
       <section className="py-16 px-4 max-w-7xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-16 text-primary">
-          Our Future Facilities
+          Our Facilities
         </h2>
         <div className="grid md:grid-cols-2 gap-8">
           {[
@@ -177,6 +188,4 @@ const CompanyProfile = () => {
       </section>
     </div>
   );
-};
-
-export default CompanyProfile;
+}

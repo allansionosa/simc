@@ -1,8 +1,9 @@
 'use client';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -12,7 +13,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { DateTimePicker } from '@/components/ui/date-time-picker/date-time-picker';
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { sendHmoApprovalMail, uploadImage } from '@/app/api';
+import { DateInput } from '@/components/ui/date-input';
 
 const hmoProviders = [
   'Maxicare',
@@ -22,77 +34,161 @@ const hmoProviders = [
   'Other',
 ];
 
-export default function HMOApprovalForm() {
-  const [form, setForm] = useState({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    dob: undefined as Date | undefined,
-    email: '',
-    contact: '',
-    hmoProvider: undefined as string | undefined,
-    company: '',
-    healthCard: null as File | null,
-    validId: null as File | null,
-    agree: false,
-  });
-  const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState<{ [k: string]: string }>({});
+// Zod validation schema
+const hmoApprovalSchema = z.object({
+  firstName: z.string().min(1, 'First name is required'),
+  middleName: z.string().optional(),
+  lastName: z.string().min(1, 'Last name is required'),
+  dateOfBirth: z.date({
+    required_error: 'Date of birth is required',
+  }),
+  email: z.string().email('Please enter a valid email address'),
+  contactNo: z.string().min(1, 'Contact number is required'),
+  hmoProvider: z.string().min(1, 'HMO provider is required'),
+  company: z.string().optional(),
+  healthCard: z
+    .instanceof(FileList)
+    .refine((file) => file?.length == 1, 'Health card is required')
+    .refine(
+      (file) => file.length <= 500 * 1024,
+      'Health card must be 500KB or less'
+    ),
+  validId: z
+    .instanceof(FileList)
+    .refine((file) => file.length == 1, 'Valid ID is required')
+    .refine(
+      (file) => file.length <= 500 * 1024,
+      'Valid ID must be 500KB or less'
+    ),
+  agree: z
+    .boolean()
+    .refine((val) => val === true, 'You must agree to the terms'),
+});
 
-  const handleInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value, type, checked, files } = e.target as HTMLInputElement;
-    if (type === 'checkbox') {
-      setForm((f) => ({ ...f, [name]: checked }));
-    } else if (type === 'file') {
-      setForm((f) => ({ ...f, [name]: files?.[0] ?? null }));
-    } else {
-      setForm((f) => ({ ...f, [name]: value }));
+type HmoApprovalFormData = z.infer<typeof hmoApprovalSchema>;
+
+export default function HMOApprovalForm() {
+  const [loading, setLoading] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [fileList, setFileList] = useState<FileList | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(Date.now());
+  const [idFileList, setIdFileList] = useState<FileList | null>(null);
+  const [idFileInputKey, setIdFileInputKey] = useState(Date.now());
+
+  const form = useForm<HmoApprovalFormData>({
+    resolver: zodResolver(hmoApprovalSchema),
+    defaultValues: {
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      email: '',
+      contactNo: '',
+      hmoProvider: '',
+      company: '',
+      healthCard: undefined,
+      validId: undefined,
+      agree: false,
+    },
+    mode: 'onChange',
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      setFileList(files);
+      form.setValue('healthCard', files);
     }
   };
 
-  const handleSelect = (name: string, value: string) => {
-    setForm((f) => ({ ...f, [name]: value }));
+  const handleValidIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const idFiles = e.target.files;
+    if (idFiles && idFiles.length > 0) {
+      setIdFileList(idFiles);
+      form.setValue('validId', idFiles);
+    }
   };
 
-  const validate = () => {
-    const newErrors: { [k: string]: string } = {};
-    if (!form.firstName) newErrors.firstName = 'Required';
-    if (!form.lastName) newErrors.lastName = 'Required';
-    if (!form.dob) newErrors.dob = 'Required';
-    if (!form.email) newErrors.email = 'Required';
-    if (!form.contact) newErrors.contact = 'Required';
-    if (!form.hmoProvider) newErrors.hmoProvider = 'Required';
-    if (!form.healthCard) newErrors.healthCard = 'Required';
-    if (!form.validId) newErrors.validId = 'Required';
-    if (!form.agree) newErrors.agree = 'You must agree to the terms.';
-    // File size/type checks
-    [
-      { key: 'healthCard', file: form.healthCard },
-      { key: 'validId', file: form.validId },
-    ].forEach(({ key, file }) => {
-      if (file) {
-        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(file.type)) {
-          newErrors[key] = 'Only jpeg, jpg, png files allowed.';
-        } else if (file.size > 500 * 1024) {
-          newErrors[key] = 'File size must be 500kb or less.';
-        }
-      }
-    });
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
+  const onSubmit = async (data: HmoApprovalFormData) => {
     setLoading(true);
-    setTimeout(() => {
+    try {
+      if (!fileList || fileList.length === 0) {
+        throw new Error('Health Card is required.');
+      } else if (!idFileList || idFileList.length === 0) {
+        throw new Error('Valid Id is required.');
+      }
+
+      const _fileList = new FormData();
+      _fileList.append('file', fileList[0]);
+      const _uploadres = await uploadImage(_fileList, 'healthcard');
+
+      const _idFileList = new FormData();
+      _idFileList.append('file', idFileList[0]);
+      const _idUploadRes = await uploadImage(_idFileList, 'valid-id');
+      const apiData: HmoApproval = {
+        firstName: data.firstName,
+        middleName: data.middleName || null,
+        lastName: data.lastName,
+        dateOfBirth: data.dateOfBirth.toISOString().split('T')[0], // Format as YYYY-MM-DD
+        email: data.email,
+        contactNo: data.contactNo,
+        hmoProvider: data.hmoProvider,
+        company: data.company || null,
+        healthCard: _uploadres,
+        validId: _idUploadRes,
+      };
+
+      await sendHmoApprovalMail(apiData);
+      setSubmitSuccess(true);
+      form.reset();
+      setFileList(null);
+      setIdFileList(null);
+      setFileInputKey(Date.now());
+      setIdFileInputKey(Date.now());
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      alert('Failed to submit form. Please try again.');
+    } finally {
       setLoading(false);
-      alert('Form submitted! (Demo)');
-    }, 1200);
+    }
   };
+
+  if (submitSuccess) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center pb-10">
+        <Card className="max-w-md w-full mx-auto shadow-xl border border-gray-200">
+          <CardContent className="pt-6 text-center">
+            <div className="mb-4">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <svg
+                  className="w-8 h-8 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Form Submitted Successfully!
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Your HMO approval request has been submitted. You will receive a
+              confirmation email shortly.
+            </p>
+            <Button onClick={() => setSubmitSuccess(false)} className="w-full">
+              Submit Another Request
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pb-10">
@@ -121,6 +217,7 @@ export default function HMOApprovalForm() {
           ></path>
         </svg>
       </section>
+
       {/* Form Section */}
       <div className="w-full flex justify-center">
         <Card className="max-w-4xl w-full mx-auto shadow-xl border border-gray-200">
@@ -137,233 +234,245 @@ export default function HMOApprovalForm() {
             </p>
           </CardHeader>
           <CardContent>
-            <form
-              className="space-y-7"
-              onSubmit={handleSubmit}
-              autoComplete="off"
-            >
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="firstName" className="mb-1 inline-block">
-                    First Name
-                  </Label>
-                  <Input
-                    placeholder=" first name"
-                    id="firstName"
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-7"
+                autoComplete="off"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
                     name="firstName"
-                    value={form.firstName}
-                    onChange={handleInput}
-                    className={errors.firstName ? 'border-red-400' : ''}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>First Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="First name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.firstName && (
-                    <span className="text-xs text-red-500">
-                      {errors.firstName}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="middleName" className="mb-1 inline-block">
-                    Middle Name
-                  </Label>
-                  <Input
-                    id="middleName"
+
+                  <FormField
+                    control={form.control}
                     name="middleName"
-                    placeholder=" middle name"
-                    value={form.middleName}
-                    onChange={handleInput}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Middle Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Middle name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </div>
-                <div>
-                  <Label htmlFor="lastName" className="mb-1 inline-block">
-                    Last Name
-                  </Label>
-                  <Input
-                    id="lastName"
+
+                  <FormField
+                    control={form.control}
                     name="lastName"
-                    placeholder=" last name"
-                    value={form.lastName}
-                    onChange={handleInput}
-                    className={errors.lastName ? 'border-red-400' : ''}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Last name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.lastName && (
-                    <span className="text-xs text-red-500">
-                      {errors.lastName}
-                    </span>
-                  )}
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <Label htmlFor="dob" className="mb-1 inline-block">
-                    Date of Birth
-                  </Label>
-                  <DateTimePicker
-                    selectedDate={form.dob}
-                    onSelect={(date) => setForm((f) => ({ ...f, dob: date }))}
-                    fromYear={1940}
-                    toYear={new Date().getFullYear()}
-                    label="Select date of birth"
-                    disableFutureDates={true}
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="dateOfBirth"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date of Birth</FormLabel>
+                        <FormControl>
+                          <DateInput
+                            value={field.value ?? undefined}
+                            onChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.dob && (
-                    <span className="text-xs text-red-500">{errors.dob}</span>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="email" className="mb-1 inline-block">
-                    Email Address
-                  </Label>
-                  <Input
-                    placeholder=" email address"
-                    id="email"
+
+                  <FormField
+                    control={form.control}
                     name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleInput}
-                    className={errors.email ? 'border-red-400' : ''}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email Address</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="email"
+                            placeholder="Email address"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.email && (
-                    <span className="text-xs text-red-500">{errors.email}</span>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="contact" className="mb-1 inline-block">
-                    Contact No.
-                  </Label>
-                  <Input
-                    placeholder=" contact number"
-                    id="contact"
-                    name="contact"
-                    value={form.contact}
-                    onChange={handleInput}
-                    className={errors.contact ? 'border-red-400' : ''}
+
+                  <FormField
+                    control={form.control}
+                    name="contactNo"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Contact No.</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Contact number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  {errors.contact && (
-                    <span className="text-xs text-red-500">
-                      {errors.contact}
-                    </span>
-                  )}
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="hmoProvider" className="mb-1 inline-block">
-                    HMO Provider
-                  </Label>
-                  <Select
-                    value={form.hmoProvider}
-                    onValueChange={(val) => handleSelect('hmoProvider', val)}
-                  >
-                    <SelectTrigger id="hmoProvider">
-                      <SelectValue placeholder="Select provider" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {hmoProviders.map((hmo) => (
-                        <SelectItem key={hmo} value={hmo}>
-                          {hmo}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {errors.hmoProvider && (
-                    <span className="text-xs text-red-500">
-                      {errors.hmoProvider}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="company" className="mb-1 inline-block">
-                    Company
-                  </Label>
-                  <Input
-                    placeholder=" company"
-                    id="company"
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="hmoProvider"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>HMO Provider</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select provider" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {hmoProviders.map((hmo) => (
+                              <SelectItem key={hmo} value={hmo}>
+                                {hmo}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
                     name="company"
-                    value={form.company}
-                    onChange={handleInput}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Company</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Company" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="healthCard" className="mb-1 inline-block">
-                    Physical/Virtual Health Card
-                  </Label>
-                  <Input
-                    id="healthCard"
-                    type="file"
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
                     name="healthCard"
-                    accept=".jpg,.jpeg,.png"
-                    onChange={handleInput}
-                    className="file:bg-primary file:text-white file:rounded  file:px-4 file:font-semibold file:border-0 file:mr-4"
+                    render={({ field: { name, onBlur, ref } }) => (
+                      <FormItem>
+                        <FormLabel>Physical/Virtual Health Card</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleFileChange}
+                            key={fileInputKey}
+                            className="file:bg-primary file:text-white file:rounded file:px-4 file:font-semibold file:border-0 file:mr-4"
+                            name={name}
+                            onBlur={onBlur}
+                            ref={ref}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-gray-500">
+                          Only jpeg, jpg, png files. Maximum file size is 500kb
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <span className="text-xs text-gray-500 block mt-1">
-                    Only jpeg, jpg, png files. Maximum file size is 500kb
-                  </span>
-                  {errors.healthCard && (
-                    <span className="text-xs text-red-500">
-                      {errors.healthCard}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <Label htmlFor="validId" className="mb-1 inline-block">
-                    Valid ID
-                  </Label>
-                  <Input
-                    id="validId"
-                    type="file"
+
+                  <FormField
+                    control={form.control}
                     name="validId"
-                    accept=".jpg,.jpeg,.png"
-                    onChange={handleInput}
-                    className="file:bg-primary file:text-white file:rounded  file:px-4 file:font-semibold file:border-0 file:mr-4"
+                    render={({ field: { name, onBlur, ref } }) => (
+                      <FormItem>
+                        <FormLabel>Valid ID</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="file"
+                            accept=".jpg,.jpeg,.png"
+                            onChange={handleValidIdChange}
+                            key={idFileInputKey}
+                            className="file:bg-primary file:text-white file:rounded file:px-4 file:font-semibold file:border-0 file:mr-4"
+                            name={name}
+                            onBlur={onBlur}
+                            ref={ref}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-gray-500">
+                          Only jpeg, jpg, png files. Maximum file size is 500kb
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                  <span className="text-xs text-gray-500 block mt-1">
-                    Only jpeg, jpg, png files. Maximum file size is 500kb
-                  </span>
-                  {errors.validId && (
-                    <span className="text-xs text-red-500">
-                      {errors.validId}
-                    </span>
-                  )}
                 </div>
-              </div>
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-2">
-                <div className="flex items-center">
-                  <Checkbox
-                    id="agree"
-                    checked={form.agree}
-                    onCheckedChange={(checked: boolean) =>
-                      setForm((f) => ({ ...f, agree: !!checked }))
-                    }
-                    className="mr-2 accent-primary"
+
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-2">
+                  <FormField
+                    control={form.control}
+                    name="agree"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel className="text-sm font-normal">
+                            I agree to the{' '}
+                            <a href="#" className="text-primary underline">
+                              Terms and Conditions
+                            </a>{' '}
+                            and the{' '}
+                            <a href="#" className="text-primary underline">
+                              Privacy Policy
+                            </a>
+                            .
+                          </FormLabel>
+                          <FormMessage />
+                        </div>
+                      </FormItem>
+                    )}
                   />
-                  <Label htmlFor="agree" className="text-sm font-normal">
-                    I agree to the{' '}
-                    <a href="#" className="text-primary underline">
-                      Terms and Conditions
-                    </a>{' '}
-                    and the{' '}
-                    <a href="#" className="text-primary underline">
-                      Privacy Policy
-                    </a>
-                    .
-                  </Label>
+
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full md:w-40 mt-2 md:mt-0"
+                  >
+                    {loading ? 'Submitting...' : 'Submit'}
+                  </Button>
                 </div>
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full md:w-40 mt-2 md:mt-0"
-                >
-                  {loading ? 'Submitting...' : 'Submit'}
-                </Button>
-              </div>
-              {errors.agree && (
-                <span className="text-xs text-red-500 block">
-                  {errors.agree}
-                </span>
-              )}
-            </form>
+              </form>
+            </Form>
           </CardContent>
         </Card>
       </div>

@@ -1,10 +1,21 @@
-'use client';
-
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle2, Phone, Globe, Mail } from 'lucide-react';
+import { Phone, Globe } from 'lucide-react';
 
-const HMOPage = () => {
+const getHMOs = async (): Promise<HMO[]> => {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
+export default async function HMOPage() {
+  const data = await getHMOs();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -42,68 +53,7 @@ const HMOPage = () => {
           Accepted HMO Companies
         </h2>
         <div className="grid md:grid-cols-2 gap-8">
-          {[
-            {
-              name: 'Maxicare Healthcare Corporation',
-              logo: '/maxicare.png',
-              contact: {
-                phone: '02-8888-9999',
-                website: 'www.maxicare.com.ph',
-                email: 'info@maxicare.com.ph',
-              },
-              coverage: [
-                'Inpatient and Outpatient Services',
-                'Emergency Care',
-                'Laboratory and Diagnostic Procedures',
-                'Specialist Consultations',
-              ],
-            },
-            {
-              name: 'Medicard Philippines, Inc.',
-              logo: '/medicard.png',
-              contact: {
-                phone: '02-8888-7777',
-                website: 'www.medicardphils.com',
-                email: 'info@medicardphils.com',
-              },
-              coverage: [
-                'Comprehensive Medical Services',
-                'Dental and Vision Care',
-                'Preventive Healthcare',
-                '24/7 Medical Assistance',
-              ],
-            },
-            {
-              name: 'Intellicare',
-              logo: '/intellicare.png',
-              contact: {
-                phone: '02-8888-6666',
-                website: 'www.intellicare.com.ph',
-                email: 'info@intellicare.com.ph',
-              },
-              coverage: [
-                'Primary Care Services',
-                'Specialist Consultations',
-                'Emergency Services',
-                'Laboratory Tests',
-              ],
-            },
-            {
-              name: 'PhilCare',
-              logo: '/philcare.jpg',
-              contact: {
-                phone: '02-8888-5555',
-                website: 'www.philcare.com.ph',
-                email: 'info@philcare.com.ph',
-              },
-              coverage: [
-                'Medical Consultations',
-                'Hospitalization Benefits',
-                'Diagnostic Procedures',
-                'Preventive Care',
-              ],
-            },
-          ].map((hmo, index) => (
+          {data.map((hmo, index) => (
             <Card
               key={index}
               className="hover:shadow-lg transition-shadow duration-300"
@@ -112,14 +62,14 @@ const HMOPage = () => {
                 <div className="flex items-center gap-4 mb-4">
                   <div className="relative w-16 h-16">
                     <Image
-                      src={hmo.logo}
-                      alt={`${hmo.name} logo`}
+                      src={hmo.image}
+                      alt={`${hmo.title} logo`}
                       fill
                       className="object-contain"
                     />
                   </div>
                   <CardTitle className="text-xl text-primary">
-                    {hmo.name}
+                    {hmo.title}
                   </CardTitle>
                 </div>
               </CardHeader>
@@ -132,19 +82,19 @@ const HMOPage = () => {
                     <div className="space-y-1">
                       <p className="flex items-center gap-2 text-gray-600">
                         <Phone className="w-4 h-4 text-accent" />
-                        {hmo.contact.phone}
+                        {hmo.contactNo}
                       </p>
                       <p className="flex items-center gap-2 text-gray-600">
                         <Globe className="w-4 h-4 text-accent" />
-                        {hmo.contact.website}
+                        {hmo.website}
                       </p>
-                      <p className="flex items-center gap-2 text-gray-600">
+                      {/* <p className="flex items-center gap-2 text-gray-600">
                         <Mail className="w-4 h-4 text-accent" />
                         {hmo.contact.email}
-                      </p>
+                      </p> */}
                     </div>
                   </div>
-                  <div>
+                  {/* <div>
                     <h4 className="font-semibold text-primary mb-2">
                       Coverage Includes
                     </h4>
@@ -156,7 +106,7 @@ const HMOPage = () => {
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </div> */}
                 </div>
               </CardContent>
             </Card>
@@ -184,6 +134,4 @@ const HMOPage = () => {
       </section>
     </div>
   );
-};
-
-export default HMOPage;
+}
