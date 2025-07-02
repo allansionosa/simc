@@ -47,3 +47,9 @@ export const JobApplicationMail = async (
     .post('/api/job-application', payload)
     .then((res) => res.data);
 };
+
+export const BookAnAppointment = async (
+  payload: BookAppointment
+): Promise<string> => {
+  return await api.post('/api/appointment', payload).then((res) => res.data);
+};

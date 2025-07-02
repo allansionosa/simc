@@ -10,10 +10,11 @@ import Link from 'next/link';
 export default async function NewsDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
   const newsList = await getNews();
-  const news = newsList.find((n) => n.slug === params.slug);
+  const news = newsList.find((n) => n.slug === slug);
   if (!news) return notFound();
 
   return (

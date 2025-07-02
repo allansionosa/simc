@@ -1,42 +1,25 @@
-'use client';
-
-import { useState } from 'react';
+import { Metadata } from 'next';
 import Image from 'next/image';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { DateTimePicker } from '@/components/ui/date-time-picker/date-time-picker';
 import { Stethoscope } from 'lucide-react';
+import AppointmentForm from '@/components/appointment/appointment-form';
+import { Card, CardContent } from '@/components/ui/card';
 
 const departments = [
   {
     name: 'Internal Medicine',
     description: 'General health check-ups and consultations',
-    icon: Stethoscope,
   },
   {
     name: 'Cardiology',
     description: 'Heart and cardiovascular care',
-    icon: Stethoscope,
   },
   {
     name: 'Pediatrics',
     description: 'Child and adolescent healthcare',
-    icon: Stethoscope,
   },
   {
     name: 'Orthopedics',
     description: 'Bone and joint care',
-    icon: Stethoscope,
   },
 ];
 
@@ -49,11 +32,26 @@ const timeSlots = [
   '04:00 PM',
 ];
 
-const AppointmentPage = () => {
-  const [date, setDate] = useState<Date>();
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
+export const metadata: Metadata = {
+  title: 'Book an Appointment - St. Irenaeus Medical Center',
+  description:
+    'Schedule your appointment with our experienced medical professionals. Book online for Internal Medicine, Cardiology, Pediatrics, and Orthopedics.',
+  keywords: [
+    'appointment',
+    'book appointment',
+    'medical consultation',
+    'healthcare',
+    'doctor appointment',
+  ],
+  openGraph: {
+    title: 'Book an Appointment - St. Irenaeus Medical Center',
+    description:
+      'Schedule your appointment with our experienced medical professionals.',
+    type: 'website',
+  },
+};
 
+export default function AppointmentPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -88,115 +86,7 @@ const AppointmentPage = () => {
       {/* Appointment Form Section */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <Card className="border-none shadow-lg">
-            <CardContent className="p-6 md:p-8">
-              <form className="space-y-6">
-                {/* Personal Information */}
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-primary">
-                    Personal Information
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input
-                        id="firstName"
-                        placeholder="Enter your first name"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" placeholder="Enter your last name" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Enter your email"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Appointment Details */}
-                <div className="space-y-4">
-                  <h3 className="text-xl font-semibold text-primary">
-                    Appointment Details
-                  </h3>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>Department</Label>
-                      <Select
-                        value={selectedDepartment}
-                        onValueChange={setSelectedDepartment}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select department" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {departments.map((dept) => (
-                            <SelectItem key={dept.name} value={dept.name}>
-                              {dept.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Date</Label>
-                      <DateTimePicker
-                        selectedDate={date}
-                        onSelect={setDate}
-                        fromYear={new Date().getFullYear()}
-                        toYear={new Date().getFullYear() + 1}
-                        label="Select appointment date"
-                        disablePastDates={true}
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Time Slot</Label>
-                      <Select
-                        value={selectedTime}
-                        onValueChange={setSelectedTime}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map((time) => (
-                            <SelectItem key={time} value={time}>
-                              {time}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="reason">Reason for Visit</Label>
-                      <Textarea
-                        id="reason"
-                        placeholder="Briefly describe your reason for visit"
-                        className="h-[100px]"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                <Button className="w-full bg-accent hover:bg-accent/90">
-                  Schedule Appointment
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          <AppointmentForm departments={departments} timeSlots={timeSlots} />
         </div>
       </section>
 
@@ -213,7 +103,7 @@ const AppointmentPage = () => {
                 className="hover:shadow-lg transition-shadow duration-300"
               >
                 <CardContent className="p-6">
-                  <dept.icon className="w-10 h-10 text-accent mb-4" />
+                  <Stethoscope className="w-10 h-10 text-accent mb-4" />
                   <h3 className="text-xl font-semibold text-primary mb-2">
                     {dept.name}
                   </h3>
@@ -244,6 +134,4 @@ const AppointmentPage = () => {
       </section>
     </div>
   );
-};
-
-export default AppointmentPage;
+}

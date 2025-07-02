@@ -1,5 +1,26 @@
+import { Metadata } from 'next';
 import CareersClient from '@/components/careers/careers-client';
 import Image from 'next/image';
+
+export const metadata: Metadata = {
+  title: 'Careers - St. Irenaeus Medical Center',
+  description:
+    'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
+  keywords: [
+    'careers',
+    'jobs',
+    'employment',
+    'healthcare',
+    'medical center',
+    'hiring',
+  ],
+  openGraph: {
+    title: 'Careers - St. Irenaeus Medical Center',
+    description:
+      'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
+    type: 'website',
+  },
+};
 
 export const getCareers = async (): Promise<Careers[]> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {

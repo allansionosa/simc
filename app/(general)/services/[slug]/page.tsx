@@ -11,10 +11,11 @@ import { AspectRatio } from '@/components/ui/aspect-ratio';
 export default async function ServiceDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
   const services = await getServices();
-  const service = services.find((s) => s.slug === params.slug);
+  const service = services.find((s) => s.slug === slug);
   if (!service) return notFound();
 
   return (

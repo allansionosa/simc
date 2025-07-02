@@ -4,7 +4,7 @@ const portals = [
   {
     label: 'Find a Doctor',
     icon: <Users className="w-7 h-7" />,
-    href: '#',
+    href: '/doctors',
     bg: 'bg-sky-500',
     text: 'text-white',
     rounded: 'rounded-lg',

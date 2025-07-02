@@ -61,6 +61,8 @@
   --success: #2ecc71; /* Green */
   --error: #e74c3c; /* Soft Red */
   --warning: #f39c12; /* Amber */
+  --destructive: #dc2626; /* Red */
+  --destructive-foreground: #ffffff; /* White for contrast */
   --card: #ffffff; /* Pure White */
   --card-foreground: #1e293b; /* Slate */
   --popover: #ffffff; /* Pure White */

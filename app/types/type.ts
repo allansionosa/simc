@@ -130,3 +130,14 @@ type JobApplication = {
   attachment: string;
   fullName: string;
 };
+
+type BookAppointment = {
+  firstname: string;
+  lastname: string;
+  email: string;
+  contactNo: string;
+  department: string;
+  preferredDate: string;
+  timeSlot: string;
+  description?: string;
+};

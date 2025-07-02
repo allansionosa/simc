@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 
 type FooterProps = {
   data: Institution;
@@ -6,7 +7,6 @@ type FooterProps = {
 const Footer = ({ data }: FooterProps) => (
   <footer className="bg-primary text-white py-8 px-4">
     <div className="container mx-auto flex flex-col lg:flex-row gap-8 lg:gap-0">
-      {/* Logo & tagline */}
       <div className="flex-1 flex flex-col  lg:items-start mb-6 lg:mb-0">
         <div className="flex  gap-2 mb-2">
           <Image
@@ -28,33 +28,35 @@ const Footer = ({ data }: FooterProps) => (
           Leading the Way in Medical Excellence, Trusted Care.
         </p>
       </div>
-      {/* Important Links */}
+
       <div className="flex-1 flex flex-col  lg:items-start mb-6 lg:mb-0">
         <span className="font-semibold mb-2">Important Links</span>
         <ul className="space-y-1 text-sm">
           <li>
-            <a href="/appointment" className="hover:underline">
+            <Link href="/appointment" className="hover:underline">
               Appointment
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="/doctors" className="hover:underline">
+            <Link href="/doctors" className="hover:underline">
               Doctors
-            </a>
+            </Link>
           </li>
+
           <li>
-            <a href="/services" className="hover:underline">
+            <Link href="/services" className="hover:underline">
               Services
-            </a>
+            </Link>
           </li>
+
           <li>
-            <a href="/about/about-us" className="hover:underline">
-              About Us
-            </a>
+            <Link href="/about/about-us" className="hover:underline">
+              About us
+            </Link>
           </li>
         </ul>
       </div>
-      {/* Contact Us */}
+
       <div className="flex-1 flex flex-col  lg:items-start mb-6 lg:mb-0">
         <span className="font-semibold mb-2">Contact Us</span>
         <ul className="space-y-1 text-sm">
