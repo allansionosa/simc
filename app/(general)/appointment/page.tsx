@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
-import { Stethoscope } from 'lucide-react';
 import AppointmentForm from '@/components/appointment/appointment-form';
-import { Card, CardContent } from '@/components/ui/card';
 
 const departments = [
   {
@@ -87,31 +85,6 @@ export default function AppointmentPage() {
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
           <AppointmentForm departments={departments} timeSlots={timeSlots} />
-        </div>
-      </section>
-
-      {/* Departments Section */}
-      <section className="py-16 px-4 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-primary">
-            Our Departments
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {departments.map((dept) => (
-              <Card
-                key={dept.name}
-                className="hover:shadow-lg transition-shadow duration-300"
-              >
-                <CardContent className="p-6">
-                  <Stethoscope className="w-10 h-10 text-accent mb-4" />
-                  <h3 className="text-xl font-semibold text-primary mb-2">
-                    {dept.name}
-                  </h3>
-                  <p className="text-gray-600">{dept.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
       </section>
 
