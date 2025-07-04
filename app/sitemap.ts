@@ -1,73 +1,74 @@
 import { MetadataRoute } from 'next';
 
+async function getNewsSlugs() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/news`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  const news = await res.json();
+  return news.map((n: { slug: string }) => `/news/${n.slug}`);
+}
+
+async function getCareersSlugs() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  const careers = await res.json();
+  return careers.map((c: { slug: string }) => `/careers/${c.slug}`);
+}
+
+async function getServicesSlugs() {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/services`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+    },
+    cache: 'no-store',
+  });
+  if (!res.ok) return [];
+  const services = await res.json();
+  return services.map((s: { slug: string }) => `/services/${s.slug}`);
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Get careers data
-  const careersRes = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/careers`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
+  const baseUrl = 'https://your-domain.com'; // <-- Change to your actual domain
+  const now = new Date();
 
-  let careers: Careers[] = [];
-  if (careersRes.ok) {
-    careers = await careersRes.json();
-  }
+  const [newsUrls, careersUrls, servicesUrls] = await Promise.all([
+    getNewsSlugs(),
+    getCareersSlugs(),
+    getServicesSlugs(),
+  ]);
 
-  const baseUrl =
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://stirenaeusmedicalcenter.com';
-
-  // Static pages
-  const staticPages = [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/careers`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/services`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/appointment`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    },
+  const staticUrls = [
+    '/',
+    '/about/about-us',
+    '/about/company-profile',
+    '/about/hmo',
+    '/appointment',
+    '/careers',
+    '/contact',
+    '/doctors',
+    '/hmo-approval',
+    '/news',
+    '/services',
+    '/terms-and-conditions',
+    '/privacy-policy',
   ];
 
-  // Dynamic career pages
-  const careerPages = careers.map((career) => ({
-    url: `${baseUrl}/careers/${career.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.6,
-  }));
+  const allUrls = [...staticUrls, ...newsUrls, ...careersUrls, ...servicesUrls];
 
-  return [...staticPages, ...careerPages];
+  return allUrls.map((path) => ({
+    url: `${baseUrl}${path}`,
+    lastModified: now,
+  }));
 }

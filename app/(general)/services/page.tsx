@@ -1,5 +1,6 @@
 import { getServices } from '@/components/hooks/useServices';
 import Image from 'next/image';
+import { Metadata } from 'next';
 
 export default async function ServicesPage() {
   const services = await getServices();
@@ -85,3 +86,41 @@ export default async function ServicesPage() {
     </main>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Our Services | St. Irenaeus Medical Center Inc.',
+  description:
+    'Discover the comprehensive medical services offered at St. Irenaeus Medical Center Inc. Your health and well-being are our top priorities.',
+  keywords: [
+    'services',
+    'medical services',
+    'St. Irenaeus Medical Center',
+    'healthcare',
+    'hospital',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'Our Services | St. Irenaeus Medical Center Inc.',
+    description:
+      'Discover the comprehensive medical services offered at St. Irenaeus Medical Center Inc. Your health and well-being are our top priorities.',
+    url: 'https://your-domain.com/services',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/room3.jpg',
+        width: 800,
+        height: 600,
+        alt: 'Medical Services at St. Irenaeus Medical Center',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Our Services | St. Irenaeus Medical Center Inc.',
+    description:
+      'Discover the comprehensive medical services offered at St. Irenaeus Medical Center Inc. Your health and well-being are our top priorities.',
+    images: ['https://your-domain.com/room3.jpg'],
+  },
+};

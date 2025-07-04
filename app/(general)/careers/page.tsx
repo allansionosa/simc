@@ -3,7 +3,7 @@ import CareersClient from '@/components/careers/careers-client';
 import Image from 'next/image';
 
 export const metadata: Metadata = {
-  title: 'Careers - St. Irenaeus Medical Center',
+  title: 'Careers | St. Irenaeus Medical Center Inc.',
   description:
     'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
   keywords: [
@@ -13,12 +13,32 @@ export const metadata: Metadata = {
     'healthcare',
     'medical center',
     'hiring',
+    'St. Irenaeus',
+    'Philippines',
   ],
   openGraph: {
-    title: 'Careers - St. Irenaeus Medical Center',
+    title: 'Careers | St. Irenaeus Medical Center Inc.',
     description:
       'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
+    url: 'https://your-domain.com/careers',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/hiring.jpg',
+        width: 800,
+        height: 600,
+        alt: 'Careers at St. Irenaeus Medical Center',
+      },
+    ],
+    locale: 'en_PH',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Careers | St. Irenaeus Medical Center Inc.',
+    description:
+      'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
+    images: ['https://your-domain.com/hiring.jpg'],
   },
 };
 

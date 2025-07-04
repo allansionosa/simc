@@ -31,21 +31,40 @@ const timeSlots = [
 ];
 
 export const metadata: Metadata = {
-  title: 'Book an Appointment - St. Irenaeus Medical Center',
+  title: 'Book an Appointment | St. Irenaeus Medical Center Inc.',
   description:
-    'Schedule your appointment with our experienced medical professionals. Book online for Internal Medicine, Cardiology, Pediatrics, and Orthopedics.',
+    'Book your appointment online with St. Irenaeus Medical Center Inc. Our experienced medical professionals are ready to assist you.',
   keywords: [
     'appointment',
     'book appointment',
-    'medical consultation',
+    'St. Irenaeus Medical Center',
     'healthcare',
-    'doctor appointment',
+    'doctors',
+    'Philippines',
   ],
   openGraph: {
-    title: 'Book an Appointment - St. Irenaeus Medical Center',
+    title: 'Book an Appointment | St. Irenaeus Medical Center Inc.',
     description:
-      'Schedule your appointment with our experienced medical professionals.',
+      'Book your appointment online with St. Irenaeus Medical Center Inc. Our experienced medical professionals are ready to assist you.',
+    url: 'https://your-domain.com/appointment',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/appointment.jpg',
+        width: 800,
+        height: 600,
+        alt: 'Book an Appointment',
+      },
+    ],
+    locale: 'en_PH',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Book an Appointment | St. Irenaeus Medical Center Inc.',
+    description:
+      'Book your appointment online with St. Irenaeus Medical Center Inc. Our experienced medical professionals are ready to assist you.',
+    images: ['https://your-domain.com/appointment.jpg'],
   },
 };
 

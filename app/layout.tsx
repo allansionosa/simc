@@ -16,9 +16,51 @@ const yeseva = Yeseva_One({
 });
 
 export const metadata: Metadata = {
-  title: 'St. Irenaeus Medical Center Inc.',
-  description: 'St. Irenaeus Medical Center Inc.',
+  title: {
+    default: 'St. Irenaeus Medical Center Inc.',
+    template: '%s | St. Irenaeus Medical Center Inc.',
+  },
+  description:
+    'St. Irenaeus Medical Center Inc. offers comprehensive healthcare services in a modern, patient-centered environment. Book appointments, explore our services, and meet our expert doctors.',
+  keywords: [
+    'medical center',
+    'healthcare',
+    'doctors',
+    'appointments',
+    'services',
+    'St. Irenaeus',
+    'hospital',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'St. Irenaeus Medical Center Inc.',
+    description:
+      'Comprehensive healthcare services in a modern, patient-centered environment.',
+    url: 'https://your-domain.com', // <-- Change to your actual domain
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/simc_blue.png',
+        width: 800,
+        height: 600,
+        alt: 'St. Irenaeus Medical Center',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'St. Irenaeus Medical Center Inc.',
+    description:
+      'Comprehensive healthcare services in a modern, patient-centered environment.',
+    images: ['https://your-domain.com/simc_blue.png'],
+  },
+  alternates: {
+    canonical: 'https://your-domain.com', // <-- Change to your actual domain
+  },
 };
+export const fetchCache = 'default-no-store';
 
 export default function RootLayout({
   children,

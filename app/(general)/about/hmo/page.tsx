@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, Globe } from 'lucide-react';
+import { Metadata } from 'next';
 
 const getHMOs = async (): Promise<HMO[]> => {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo`, {
@@ -135,3 +136,41 @@ export default async function HMOPage() {
     </div>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Accepted HMO Providers | St. Irenaeus Medical Center Inc.',
+  description:
+    'See the list of accepted HMO providers at St. Irenaeus Medical Center Inc. We partner with leading companies to provide accessible healthcare.',
+  keywords: [
+    'HMO',
+    'health maintenance organization',
+    'insurance',
+    'St. Irenaeus Medical Center',
+    'healthcare',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'Accepted HMO Providers | St. Irenaeus Medical Center Inc.',
+    description:
+      'See the list of accepted HMO providers at St. Irenaeus Medical Center Inc. We partner with leading companies to provide accessible healthcare.',
+    url: 'https://your-domain.com/about/hmo',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/hmobg.jpg',
+        width: 800,
+        height: 600,
+        alt: 'Accepted HMO Providers',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Accepted HMO Providers | St. Irenaeus Medical Center Inc.',
+    description:
+      'See the list of accepted HMO providers at St. Irenaeus Medical Center Inc. We partner with leading companies to provide accessible healthcare.',
+    images: ['https://your-domain.com/hmobg.jpg'],
+  },
+};

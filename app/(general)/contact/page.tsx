@@ -7,6 +7,7 @@ import {
 import ContactUsForm from '@/components/contact/contact-us-form';
 import { getFaqs } from '@/components/hooks/useFaqs';
 import { Institution } from '@/components/hooks/useInstitution';
+import { Metadata } from 'next';
 
 export default async function ContactPage() {
   const faqs = await getFaqs();
@@ -85,3 +86,42 @@ export default async function ContactPage() {
     </main>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Contact Us | St. Irenaeus Medical Center Inc.',
+  description:
+    'Contact St. Irenaeus Medical Center Inc. for inquiries, appointments, or support. We are here to help you with your healthcare needs.',
+  keywords: [
+    'contact',
+    'St. Irenaeus Medical Center',
+    'support',
+    'inquiries',
+    'appointments',
+    'healthcare',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'Contact Us | St. Irenaeus Medical Center Inc.',
+    description:
+      'Contact St. Irenaeus Medical Center Inc. for inquiries, appointments, or support. We are here to help you with your healthcare needs.',
+    url: 'https://your-domain.com/contact',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/simc_blue.png',
+        width: 800,
+        height: 600,
+        alt: 'Contact St. Irenaeus Medical Center',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Us | St. Irenaeus Medical Center Inc.',
+    description:
+      'Contact St. Irenaeus Medical Center Inc. for inquiries, appointments, or support. We are here to help you with your healthcare needs.',
+    images: ['https://your-domain.com/simc_blue.png'],
+  },
+};

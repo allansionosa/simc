@@ -1,5 +1,6 @@
 import { getDoctors } from '@/components/hooks/useDoctor';
 import Image from 'next/image';
+import { Metadata } from 'next';
 
 // const doctors = [
 //   {
@@ -132,3 +133,41 @@ export default async function DoctorsPage() {
     </main>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Our Doctors | St. Irenaeus Medical Center Inc.',
+  description:
+    'Meet the expert doctors at St. Irenaeus Medical Center Inc. Our team is dedicated to providing exceptional care across a wide range of specialties.',
+  keywords: [
+    'doctors',
+    'medical experts',
+    'St. Irenaeus Medical Center',
+    'healthcare',
+    'specialists',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'Our Doctors | St. Irenaeus Medical Center Inc.',
+    description:
+      'Meet the expert doctors at St. Irenaeus Medical Center Inc. Our team is dedicated to providing exceptional care across a wide range of specialties.',
+    url: 'https://your-domain.com/doctors',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/doctors-group.jpg',
+        width: 800,
+        height: 600,
+        alt: 'Our Doctors at St. Irenaeus Medical Center',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Our Doctors | St. Irenaeus Medical Center Inc.',
+    description:
+      'Meet the expert doctors at St. Irenaeus Medical Center Inc. Our team is dedicated to providing exceptional care across a wide range of specialties.',
+    images: ['https://your-domain.com/doctors-group.jpg'],
+  },
+};

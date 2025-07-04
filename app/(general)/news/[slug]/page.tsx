@@ -6,6 +6,43 @@ import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const newsList = await getNews();
+  const news = newsList.find((n) => n.slug === params.slug);
+  if (!news) return {};
+  return {
+    title: `${news.title} | St. Irenaeus Medical Center Inc.`,
+    description: news.description,
+    openGraph: {
+      title: `${news.title} | St. Irenaeus Medical Center Inc.`,
+      description: news.description,
+      url: `https://your-domain.com/news/${news.slug}`,
+      siteName: 'St. Irenaeus Medical Center Inc.',
+      images: [
+        {
+          url: `https://your-domain.com${news.image}`,
+          width: 800,
+          height: 600,
+          alt: news.title,
+        },
+      ],
+      locale: 'en_PH',
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${news.title} | St. Irenaeus Medical Center Inc.`,
+      description: news.description,
+      images: [`https://your-domain.com${news.image}`],
+    },
+  };
+}
 
 export default async function NewsDetailPage({
   params,

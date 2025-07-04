@@ -1,6 +1,7 @@
 import { getNews } from '@/components/hooks/useNews';
 import Image from 'next/image';
 import dayjs from 'dayjs';
+import { Metadata } from 'next';
 
 export default async function NewsPage() {
   const data = await getNews();
@@ -99,3 +100,42 @@ export default async function NewsPage() {
     </main>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'News & Updates | St. Irenaeus Medical Center Inc.',
+  description:
+    'Stay up to date with the latest news, events, and updates from St. Irenaeus Medical Center Inc. We are committed to keeping our community informed and healthy.',
+  keywords: [
+    'St. Irenaeus Medical Center',
+    'news',
+    'updates',
+    'events',
+    'healthcare',
+    'hospital',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'News & Updates | St. Irenaeus Medical Center Inc.',
+    description:
+      'Stay up to date with the latest news, events, and updates from St. Irenaeus Medical Center Inc.',
+    url: 'https://your-domain.com/news',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/news1.jpg',
+        width: 800,
+        height: 600,
+        alt: 'St. Irenaeus Medical Center News',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'News & Updates | St. Irenaeus Medical Center Inc.',
+    description:
+      'Stay up to date with the latest news, events, and updates from St. Irenaeus Medical Center Inc.',
+    images: ['https://your-domain.com/news1.jpg'],
+  },
+};
