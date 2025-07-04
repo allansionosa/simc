@@ -39,6 +39,9 @@ const appointmentSchema = z.object({
   }),
   timeSlot: z.string().min(1, 'Please select a time slot'),
   description: z.string().optional(),
+  agree: z.boolean().refine((val) => val === true, {
+    message: 'You must agree to the Terms and Conditions and Privacy Policy',
+  }),
 });
 
 type AppointmentFormData = z.infer<typeof appointmentSchema>;
@@ -71,6 +74,7 @@ export default function AppointmentForm({
       preferredDate: undefined,
       timeSlot: '',
       description: '',
+      agree: false,
     },
     mode: 'onChange',
   });
@@ -80,7 +84,6 @@ export default function AppointmentForm({
     setSubmitStatus('idle');
 
     try {
-      // Format the date to YYYY-MM-DD string
       const formattedDate = data.preferredDate.toISOString().split('T')[0];
 
       const appointmentData = {
@@ -326,6 +329,52 @@ export default function AppointmentForm({
               </div>
             </div>
 
+            {/* Terms and Conditions & Privacy Policy Agreement */}
+            <FormField
+              control={form.control}
+              name="agree"
+              render={({ field }) => (
+                <FormItem className="flex flex-col items-start space-y-1">
+                  <div className="flex items-center space-x-2">
+                    <FormControl>
+                      <input
+                        type="checkbox"
+                        id="agree"
+                        className="h-4 w-4 border-gray-300 rounded focus:ring-accent"
+                        checked={field.value}
+                        onChange={(e) => field.onChange(e.target.checked)}
+                      />
+                    </FormControl>
+                    <FormLabel
+                      htmlFor="agree"
+                      className="text-sm font-normal m-0"
+                    >
+                      I agree to the{' '}
+                      <a
+                        href="/terms-and-conditions"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline text-primary hover:text-accent"
+                      >
+                        Terms and Conditions
+                      </a>{' '}
+                      and{' '}
+                      <a
+                        href="/privacy-policy"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline text-primary hover:text-accent"
+                      >
+                        Privacy Policy
+                      </a>
+                    </FormLabel>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Submit Button */}
             <Button
               type="submit"
               className="w-full bg-accent hover:bg-accent/90"

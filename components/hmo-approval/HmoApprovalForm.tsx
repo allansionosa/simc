@@ -451,11 +451,17 @@ export default function HMOApprovalForm() {
                         <div className="space-y-1 leading-none">
                           <FormLabel className="text-sm font-normal">
                             I agree to the{' '}
-                            <a href="#" className="text-primary underline">
+                            <a
+                              href="/terms-and-conditions"
+                              className="text-primary underline"
+                            >
                               Terms and Conditions
                             </a>{' '}
                             and the{' '}
-                            <a href="#" className="text-primary underline">
+                            <a
+                              href="/privacy-policy"
+                              className="text-primary underline"
+                            >
                               Privacy Policy
                             </a>
                             .

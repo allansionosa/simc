@@ -204,3 +204,12 @@ type ResetPassword = {
   password: string;
   confirmPassword: string;
 };
+
+type TermsPrivacy = {
+  id: number;
+  termsAndConditions: string;
+  privacyPolicy: string;
+  termsLastModified: string;
+  privacyLastModified: string;
+  updatedBy: string | null;
+};
