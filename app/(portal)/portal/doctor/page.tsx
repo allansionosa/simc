@@ -1,186 +1,245 @@
 'use client';
-import Image from 'next/image';
-import { useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { DoctorDataTable } from '@/components/ui/data-table/doctor-data-table';
 import PatientDrawer from '@/components/ui/patient-drawer';
-import { PatientExam } from '../patient/page';
+import { useDoctor, useDoctorActions } from '@/app/store';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
+import { doctorRefreshToken, logout } from '@/app/api/auth';
+import { toast } from 'sonner';
 
-export type DoctorPatient = {
-  patientNumber: string;
-  patientName: string;
-  results: PatientExam[];
-  onViewFiles?: (p: DoctorPatient) => void;
+import {
+  changePassword,
+  getDoctorPatientExam,
+  getDoctorsPatient,
+} from '@/app/api';
+import { getDoctorColumns } from '@/components/ui/data-table/doctor-columns';
+import { Spinner } from '@/components/ui/spinner';
+import HeadBar from '../../headbar';
+
+type DoctorPatient = {
+  id: number;
+  patientno: string;
+  patientname: string;
+  key?: string;
 };
 
-// Doctor's patient list (mock data)
-const patients = [
-  {
-    patientNumber: 'SIMC250000250',
-    patientName: 'BELALO, CRISSELDA HAZEL ARGUEL',
-    results: [
-      {
-        id: 'SIMCXRA25000065',
-        examination: 'Chest PA',
-        dateReleased: '2025-04-08',
-        file: 'TEST20001479.pdf',
-        patientNumber: 'SIMC250000250',
-        patientName: 'BELALO, CRISSELDA HAZEL ARGUEL',
-      },
-      // Add more results if needed
-    ],
-  },
-  {
-    patientNumber: 'SIMC250000251',
-    patientName: 'SANTOS, JUAN DELA CRUZ',
-    results: [
-      {
-        id: 'SIMCLAB25000099',
-        examination: 'Blood Chemistry',
-        dateReleased: '2025-05-10',
-        file: 'TEST20001479.pdf',
-        patientNumber: 'SIMC250000251',
-        patientName: 'SANTOS, JUAN DELA CRUZ',
-      },
-      {
-        id: 'SIMCURN25000100',
-        examination: 'Urinalysis',
-        dateReleased: '2025-05-12',
-        file: 'TEST20001479.pdf',
-        patientNumber: 'SIMC250000251',
-        patientName: 'SANTOS, JUAN DELA CRUZ',
-      },
-    ],
-  },
-  // Add more patients if needed
-];
+type PatientExam = {
+  id: number;
+  examination: string;
+  dateReleased: string;
+  file: string;
+  patientNumber: number;
+  patientName: string;
+  key?: string;
+};
 
-// Columns for the doctor table
-const doctorColumns = [
-  {
-    accessorKey: 'patientNumber',
-    header: 'Patient Number',
-    cell: ({ row }: { row: { getValue: (key: string) => string } }) => (
-      <span className="font-mono">{row.getValue('patientNumber')}</span>
-    ),
-  },
-  {
-    accessorKey: 'patientName',
-    header: 'PATIENT NAME',
-    cell: ({ row }: { row: { getValue: (key: string) => string } }) => (
-      <span>{row.getValue('patientName')}</span>
-    ),
-  },
-  {
-    id: 'viewFiles',
-    header: 'VIEW FILE',
-    cell: ({ row }: { row: { original: DoctorPatient } }) => (
-      <button
-        className="text-primary underline hover:text-secondary font-semibold"
-        onClick={() => row.original.onViewFiles?.(row.original)}
-      >
-        VIEW FILES
-      </button>
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
-];
+type ChangePasswordFormData = {
+  currentPass: string;
+  newPass: string;
+  confirmPassword: string;
+};
+
+type ApiError = {
+  response?: {
+    data?: string;
+    message?: string;
+  };
+  message?: string;
+};
 
 export default function DoctorDashboard() {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState<DoctorPatient | null>(
-    null
-  );
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const { email, doctorcode, token } = useDoctor();
+  const [isChangePass, setIsChangePass] = useState(false);
+  const [isChangeingPass, setIsChangeingPass] = useState(false);
+  const { setDoctor } = useDoctorActions();
+  const router = useRouter();
+  const [filteredDoctorPatient, setFilteredDoctorPatient] = useState<
+    DoctorPatient[]
+  >([]);
+  const [patientData, setPatientData] = useState<PatientExam[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isPatientDataLoading, setIsPatientDataLoading] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [doctorRecord, setDataRecord] = useState<DoctorPatient>();
+  const access_token = Cookies.get('simc_doctor_access_token');
 
-  // Prepare data with onViewFiles handler
-  const tableData = patients.map((patient) => ({
-    ...patient,
-    onViewFiles: (p: DoctorPatient) => {
-      setSelectedPatient(p);
-      setDrawerOpen(true);
-    },
-  }));
-
-  const handleLogout = () => {
-    // Optionally clear auth/session here
-    window.location.href = '/portal/doctor/login';
+  const refresh = async () => {
+    try {
+      if (access_token) {
+        setIsLoading(true);
+        const response = await doctorRefreshToken(access_token);
+        const { email, doctorcode, token } = response;
+        setDoctor(email, doctorcode, token);
+        setIsLoading(false);
+      } else {
+        router.push('/portal/doctor/login');
+      }
+    } catch (err: unknown) {
+      handleApiError(err as ApiError);
+    }
   };
 
+  const handleApiError = (err: ApiError) => {
+    const errorMessage =
+      err.response?.data ||
+      err.response?.message ||
+      err.message ||
+      'Something went wrong, please try again later';
+    toast(errorMessage);
+    Cookies.remove('simc_doctor_access_token');
+    router.push('/portal/doctor/login');
+    console.log(err);
+  };
+
+  useEffect(() => {
+    if (access_token) {
+      refresh();
+    } else {
+      setIsLoading(true);
+      router.push('/portal/doctor/login');
+    }
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await logout('doctor');
+      Cookies.remove('simc_doctor_access_token');
+      router.push('/portal/doctor/login');
+    } catch (err: unknown) {
+      handleApiError(err as ApiError);
+    }
+  };
+
+  const handleOpenChangePass = () => {
+    setIsChangePass(true);
+  };
+
+  const hanleCancelChangePass = () => {
+    setIsChangePass(false);
+  };
+
+  const handleChangePassword = async (values: ChangePasswordFormData) => {
+    try {
+      setIsChangeingPass(true);
+      const payload = {
+        currentPass: values.currentPass,
+        newPass: values.newPass,
+        email: email,
+      };
+      const response = await changePassword(payload, 'doctor', token);
+      toast(response);
+      setIsChangePass(false);
+    } catch (err: unknown) {
+      handleApiError(err as ApiError);
+    } finally {
+      setIsChangeingPass(false);
+    }
+  };
+
+  const getPatients = async () => {
+    try {
+      const res = await getDoctorsPatient(doctorcode, token);
+      const data = res.map((item) => ({
+        key: String(item.id),
+        ...item,
+      }));
+      setFilteredDoctorPatient(data);
+    } catch (err: unknown) {
+      handleApiError(err as ApiError);
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoading) {
+      getPatients();
+    }
+  }, [isLoading]);
+
+  const getPatientResults = async (doctorcode: string, patientNo: string) => {
+    try {
+      const res = await getDoctorPatientExam(doctorcode, patientNo, token);
+      // Map API response to PatientExam type to match the expected structure
+      const data: PatientExam[] = (Array.isArray(res) ? res : []).map(
+        (item: unknown) => {
+          if (item && typeof item === 'object') {
+            const obj = item as Record<string, unknown>;
+            return {
+              id: Number(obj.id),
+              examination: String(obj.examination),
+              dateReleased: String(obj.dateReleased || obj.resultdate || ''),
+              file: String(obj.file || obj.filename || ''),
+              patientNumber: Number(obj.patientNumber || patientNo),
+              patientName: String(obj.patientName || ''),
+              key: String(obj.id),
+            };
+          }
+          // fallback for unexpected item
+          return {
+            id: 0,
+            examination: '',
+            dateReleased: '',
+            file: '',
+            patientNumber: 0,
+            patientName: '',
+            key: '0',
+          };
+        }
+      );
+      setPatientData(data);
+    } catch (err: unknown) {
+      handleApiError(err as ApiError);
+    } finally {
+      setIsDataLoading(false);
+      setIsPatientDataLoading(false);
+    }
+  };
+
+  const handleOpenDrawer = (record: DoctorPatient) => {
+    getPatientResults(doctorcode, record.patientno);
+    setIsDrawerOpen(true);
+    setDataRecord(record);
+  };
+
+  const handleCloseDrawer = () => setIsDrawerOpen(false);
+
+  const columns = getDoctorColumns({ handleOpenDrawer });
+
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header (same as patient page) */}
-      <header className="w-full bg-white shadow-sm py-4 px-4 md:px-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative w-14 h-14 md:w-16 md:h-16">
-            <Image
-              src="/simc_blue.png"
-              alt="SIMC Logo"
-              fill
-              className="object-contain"
+    <section className="bg-milk h-screen">
+      {!isLoading ? (
+        <>
+          <HeadBar
+            user={email}
+            onLogout={handleLogout}
+            open={isChangePass}
+            loading={isChangeingPass}
+            onClick={handleOpenChangePass}
+            onCancel={hanleCancelChangePass}
+            onSubmit={handleChangePassword}
+          />
+          <div className="bg-white p-3 mt-10 mx-auto rounded-md md:container">
+            <DoctorDataTable
+              columns={columns}
+              data={filteredDoctorPatient}
+              isLoading={isDataLoading}
             />
           </div>
-          <div>
-            <span className="text-2xl md:text-3xl font-bold text-primary leading-tight">
-              St. Irenaeus
-            </span>
-            <div className="text-xs text-gray-600 -mt-1">
-              Medical Center Inc.
-            </div>
-          </div>
-        </div>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            className="flex items-center gap-2 text-gray-700 font-medium text-xs md:text-base focus:outline-none"
-            onClick={() => setDropdownOpen((open) => !open)}
-          >
-            doctor@example.com
-            <svg
-              className="w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10">
-              <button
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex justify-center items-start mt-8 md:mt-12 px-2 md:px-0">
-        <div className="bg-white p-3 mt-10 mx-2 rounded-md md:container ">
-          <DoctorDataTable
-            columns={doctorColumns}
-            data={tableData as unknown as DoctorPatient[]}
-            isLoading={false}
+          <PatientDrawer
+            open={isDrawerOpen}
+            onClose={handleCloseDrawer}
+            record={doctorRecord}
+            patientData={patientData}
+            isLoading={isPatientDataLoading}
+            token={token}
           />
-        </div>
-        {/* Patient Drawer for viewing results */}
-        <PatientDrawer
-          open={drawerOpen}
-          onClose={() => setDrawerOpen(false)}
-          record={selectedPatient as DoctorPatient}
-          patientData={selectedPatient?.results || []}
-          isLoading={false}
-        />
-      </main>
-    </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
+    </section>
   );
 }

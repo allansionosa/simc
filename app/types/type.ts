@@ -141,3 +141,66 @@ type BookAppointment = {
   timeSlot: string;
   description?: string;
 };
+
+type AuthResponseTypes = {
+  email: string;
+  patientno: string;
+  token: string;
+  access_token: string;
+};
+type PatientExam = {
+  id: number;
+  examination: string;
+  examid: string;
+  filename: string;
+  resultdate: string;
+};
+
+type ChangePasswordPayload = {
+  currentPass: string;
+  newPass: string;
+  email: string;
+};
+
+type LoginTypes = {
+  email: string;
+  password: string;
+};
+
+type FormValueType = {
+  firstname: string;
+  middlename: string;
+  lastname: string;
+  patientno: string;
+  contactno: string;
+  email: string;
+  password: string;
+};
+
+type DoctorPatient = {
+  id: number;
+  patientno: string;
+  patientname: string;
+};
+
+type AuthDoctorResponseTypes = {
+  email: string;
+  doctorcode: string;
+  token: string;
+  access_token: string;
+};
+
+type DoctorRegister = {
+  fname: string;
+  mname: string;
+  lname: string;
+  doctorcode: string;
+  email: string;
+  contactno: string;
+  password: string;
+};
+
+type ResetPassword = {
+  password: string;
+  confirmPassword: string;
+};

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Yeseva_One } from 'next/font/google';
 import '@/app/globals.css';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({
   variable: '--font-inter',
@@ -30,6 +31,7 @@ export default function RootLayout({
         className={`${inter.className} ${yeseva.variable} antialiased scroll-smooth`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );

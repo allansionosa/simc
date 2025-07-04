@@ -18,10 +18,10 @@ export function DoctorToolbar<TData>({ table }: DataTableToolbarProps<TData>) {
         <Input
           placeholder="Search Patient Name"
           value={
-            (table.getColumn('patientName')?.getFilterValue() as string) ?? ''
+            (table.getColumn('patientname')?.getFilterValue() as string) ?? ''
           }
           onChange={(event) =>
-            table.getColumn('patientName')?.setFilterValue(event.target.value)
+            table.getColumn('patientname')?.setFilterValue(event.target.value)
           }
           className="h-8 w-[170px] md:w-[250px]"
         />

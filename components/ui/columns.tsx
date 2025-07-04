@@ -12,8 +12,9 @@ import {
 import { PatientExam } from '@/app/(portal)/portal/patient/page';
 import { FolderSearch } from 'lucide-react';
 
-export const getColumns = (): // handleViewPDF: (value: string) => void
-ColumnDef<PatientExam>[] => [
+export const getColumns = (
+  handleViewPDF: (value: string) => void
+): ColumnDef<PatientExam>[] => [
   {
     accessorKey: 'id',
     header: ({ column }) => (
@@ -61,16 +62,14 @@ ColumnDef<PatientExam>[] => [
     accessorKey: 'file',
     header: 'File',
     cell: ({ row }) => {
-      const file = row.getValue('file') as string;
+      const filename = row.getValue('file') as string;
       return (
         <div>
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <a
-                  href={`/${file}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={() => handleViewPDF(filename)}
                   className="text-2xl cursor-pointer grid text-primary hover:text-secondary"
                 >
                   <FolderSearch />

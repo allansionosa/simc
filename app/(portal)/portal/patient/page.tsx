@@ -1,10 +1,15 @@
 'use client';
-import Image from 'next/image';
-import { useState, useRef } from 'react';
-
+import { useEffect, useState } from 'react';
+import Cookies from 'js-cookie';
 import { DataTable } from '@/components/ui/data-table/data-table';
 import { useRouter } from 'next/navigation';
 import { getColumns } from '@/components/ui/columns';
+import { usePatientUser, usePatientUserActions } from '@/app/store';
+import { changePassword, getPatientExam, viewProtectedPdf } from '@/app/api';
+import { logout, refreshToken } from '@/app/api/auth';
+import { toast } from 'sonner';
+import HeadBar from '../../headbar';
+import { Spinner } from '@/components/ui/spinner';
 
 export type PatientExam = {
   id: number;
@@ -15,125 +20,213 @@ export type PatientExam = {
   patientName: string;
 };
 
-const sampleData: PatientExam[] = [
-  {
-    id: 1,
-    examination: 'CBC (Complete Blood Count)',
-    dateReleased: '2024-06-01',
-    file: 'TEST20001479.pdf',
-    patientNumber: 1234567890,
-    patientName: 'John Doe',
-  },
-  {
-    id: 2,
-    examination: 'Chest X-Ray',
-    dateReleased: '2024-05-28',
-    file: 'TEST20001479.pdf',
-    patientNumber: 1234567890,
-    patientName: 'John Doe',
-  },
-  {
-    id: 3,
-    examination: 'Urinalysis',
-    dateReleased: '2024-05-20',
-    file: 'TEST20001479.pdf',
-    patientNumber: 1234567890,
-    patientName: 'John Doe',
-  },
-];
+type ChangePasswordFormData = {
+  currentPass: string;
+  newPass: string;
+  confirmPassword: string;
+};
 
-const PatientDashboard = () => {
-  // Dropdown state
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown on outside click
-  // (Optional: can be removed if you use a UI lib for dropdown)
-  // useEffect(() => {
-  //   function handleClickOutside(event: MouseEvent) {
-  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-  //       setDropdownOpen(false);
-  //     }
-  //   }
-  //   document.addEventListener('mousedown', handleClickOutside);
-  //   return () => document.removeEventListener('mousedown', handleClickOutside);
-  // }, []);
-
+export default function Patient() {
+  const { setUser } = usePatientUserActions();
+  const { email, patientno, token } = usePatientUser();
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const [filteredData, setFilteredData] = useState<PatientExam[]>([]);
+  const [isChangePass, setIsChangePass] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [isChangingPass, setIsChangingPass] = useState(false);
+  const access_token = Cookies.get('simc_patient_access_token');
 
-  const handleLogout = () => {
-    // Optionally clear auth/session here
-    router.push('/portal/patient/login');
+  const handleViewPDF = async (value: string) => {
+    try {
+      await viewProtectedPdf(value, token);
+    } catch (error) {
+      console.error('Error fetching the PDF:', error);
+      toast(
+        'Error fetching the PDF. Sorry for the inconvenience, please try again later.'
+      );
+    }
+  };
+
+  const refresh = async () => {
+    try {
+      if (access_token) {
+        setIsLoading(true);
+        const response = await refreshToken('patient', access_token);
+        const { email, patientno, token } = response;
+        setUser(email, patientno, token);
+        setIsLoading(false);
+      } else {
+        router.push('/portal/patient/login');
+      }
+    } catch (err: unknown) {
+      const errorMsg =
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+          ? (err.response.data.message as string)
+          : 'Something went wrong, please try again later';
+      toast(errorMsg);
+      Cookies.remove('simc_patient_access_token');
+      router.push('/portal/patient/login');
+      console.log(err);
+    }
+  };
+
+  const getPatientResults = async () => {
+    try {
+      const res = await getPatientExam(patientno, token);
+      // Map API response to PatientExam type
+      const data: PatientExam[] = (Array.isArray(res) ? res : []).map(
+        (item: unknown) => {
+          if (item && typeof item === 'object') {
+            const obj = item as Record<string, unknown>;
+            return {
+              id: Number(obj.id),
+              examination: String(obj.examination),
+              dateReleased: String(obj.dateReleased || obj.resultdate || ''),
+              file: String(obj.file || obj.filename || ''),
+              patientNumber: Number(obj.patientNumber || patientno),
+              patientName: String(obj.patientName || email),
+            };
+          }
+          // fallback for unexpected item
+          return {
+            id: 0,
+            examination: '',
+            dateReleased: '',
+            file: '',
+            patientNumber: 0,
+            patientName: '',
+          };
+        }
+      );
+      setFilteredData(data);
+    } catch (err: unknown) {
+      const errorMsg =
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+          ? (err.response.data.message as string)
+          : 'Something went wrong, please try again later';
+      toast(errorMsg);
+      console.log(err);
+    } finally {
+      setIsDataLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (access_token) {
+      refresh();
+    } else {
+      setIsLoading(true);
+      router.push('/portal/patient/login');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      getPatientResults();
+    }
+  }, [isLoading]);
+
+  const handleLogout = async () => {
+    try {
+      await logout('patient');
+      Cookies.remove('simc_patient_access_token');
+      router.push('/portal/patient/login');
+    } catch (err: unknown) {
+      const errorMsg =
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data &&
+        typeof err.response.data === 'object' &&
+        'message' in err.response.data
+          ? (err.response.data.message as string)
+          : 'Something went wrong, please try again later';
+      toast(errorMsg);
+      console.log(err);
+    }
+  };
+
+  const handleOpenChangePass = () => {
+    setIsChangePass(true);
+  };
+
+  const handleCancelChangePass = () => {
+    setIsChangePass(false);
+  };
+
+  const handleChangePassword = async (values: ChangePasswordFormData) => {
+    try {
+      setIsChangingPass(true);
+      const payload = {
+        currentPass: values.currentPass,
+        newPass: values.newPass,
+        email: email,
+      };
+      const response = await changePassword(payload, 'patient', token);
+      toast('Password Updated! ' + response);
+      setIsChangePass(false);
+    } catch (err: unknown) {
+      const errorMsg =
+        err &&
+        typeof err === 'object' &&
+        'response' in err &&
+        err.response &&
+        typeof err.response === 'object' &&
+        'data' in err.response &&
+        err.response.data
+          ? (err.response.data as string)
+          : 'Sorry for the inconvenience, please try again later.';
+      toast(errorMsg);
+      console.log(err);
+    } finally {
+      setIsChangingPass(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      {/* Header */}
-      <header className="w-full bg-white shadow-sm py-4 px-4 md:px-8 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative w-14 h-14 md:w-16 md:h-16">
-            <Image
-              src="/simc_blue.png"
-              alt="SIMC Logo"
-              fill
-              className="object-contain"
+    <section className="bg-milk h-screen">
+      {!isLoading ? (
+        <>
+          <HeadBar
+            user={email}
+            onLogout={handleLogout}
+            open={isChangePass}
+            loading={isChangingPass}
+            onClick={handleOpenChangePass}
+            onCancel={handleCancelChangePass}
+            onSubmit={handleChangePassword}
+          />
+          <div className="bg-white p-3 mt-10 rounded-md md:container mx-auto">
+            <DataTable
+              data={filteredData}
+              columns={getColumns(handleViewPDF)}
+              isLoading={isDataLoading}
             />
           </div>
-          <div>
-            <span className="text-2xl md:text-3xl font-bold text-primary leading-tight">
-              St. Irenaeus
-            </span>
-            <div className="text-xs text-gray-600 -mt-1">
-              Medical Center Inc.
-            </div>
-          </div>
-        </div>
-        <div className="relative" ref={dropdownRef}>
-          <button
-            className="flex items-center gap-2 text-gray-700 font-medium text-xs md:text-base focus:outline-none"
-            onClick={() => setDropdownOpen((open) => !open)}
-          >
-            patient@example.com
-            <svg
-              className="w-5 h-5 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M19 9l-7 7-7-7"
-              />
-            </svg>
-          </button>
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow-lg z-10">
-              <button
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </div>
-          )}
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex justify-center items-start mt-8 md:mt-12 px-2 md:px-0">
-        <div className="bg-white rounded-xl shadow-lg p-4 md:p-8 w-full max-w-4xl">
-          {/* Table Area */}
-          <DataTable
-            columns={getColumns()}
-            data={sampleData}
-            isLoading={false}
-          />
-        </div>
-      </main>
-    </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
+    </section>
   );
-};
-
-export default PatientDashboard;
+}
