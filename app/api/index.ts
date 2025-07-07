@@ -45,15 +45,33 @@ export const viewProtectedPdf = async (
       responseType: 'blob',
     });
 
-    const bloblUrl = window.URL.createObjectURL(response.data);
-    const newWindow = window.open(bloblUrl, '_tab');
-    if (!newWindow) {
-      const link = document.createElement('a');
-      link.href = bloblUrl;
-      link.download = 'protected.pdf';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+    // Check for URL.createObjectURL support
+    if (
+      typeof window !== 'undefined' &&
+      window.URL &&
+      window.URL.createObjectURL
+    ) {
+      const bloblUrl = window.URL.createObjectURL(response.data);
+      const newWindow = window.open(bloblUrl, '_tab');
+      if (!newWindow) {
+        const link = document.createElement('a');
+        link.href = bloblUrl;
+        link.download = 'protected.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      // Clean up the object URL to prevent memory leaks
+      setTimeout(() => {
+        if (window.URL && window.URL.revokeObjectURL) {
+          window.URL.revokeObjectURL(bloblUrl);
+        }
+      }, 1000);
+    } else {
+      // Fallback for older browsers
+      throw new Error(
+        'PDF viewing is not supported in this browser. Please download the file manually.'
+      );
     }
   } catch (error: unknown) {
     if (

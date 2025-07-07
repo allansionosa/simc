@@ -4,12 +4,23 @@ import { Metadata } from 'next';
 export default async function TermsCondition() {
   const terms = await getTermsPrivacy();
   return (
-    <section className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <section className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 min-h-screen">
       <h1 className="text-3xl font-bold mb-4 text-center">
         Terms and Conditions
       </h1>
       <p className="text-sm text-gray-500 mb-8 text-center">
-        Last updated: {new Date(terms.termsLastModified).toLocaleDateString()}
+        Last updated:{' '}
+        {(() => {
+          try {
+            return new Date(terms.termsLastModified).toLocaleDateString();
+          } catch {
+            // Fallback for browsers that don't support toLocaleDateString
+            const date = new Date(terms.termsLastModified);
+            return `${
+              date.getMonth() + 1
+            }/${date.getDate()}/${date.getFullYear()}`;
+          }
+        })()}
       </p>
       <div
         className="prose prose-lg max-w-none tiptap-content mx-auto"

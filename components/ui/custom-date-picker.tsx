@@ -54,11 +54,16 @@ export function CustomDatePicker({
   }
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-    });
+    try {
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+      });
+    } catch {
+      // Fallback for browsers that don't support toLocaleDateString options
+      return `${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;
+    }
   };
 
   const isToday = (date: Date) => {
@@ -147,10 +152,33 @@ export function CustomDatePicker({
                 <ChevronLeft className="h-4 w-4" />
               </Button>
               <h3 className="text-sm font-semibold text-primary">
-                {currentMonth.toLocaleDateString('en-US', {
-                  month: 'long',
-                  year: 'numeric',
-                })}
+                {(() => {
+                  try {
+                    return currentMonth.toLocaleDateString('en-US', {
+                      month: 'long',
+                      year: 'numeric',
+                    });
+                  } catch {
+                    // Fallback for browsers that don't support toLocaleDateString options
+                    const months = [
+                      'January',
+                      'February',
+                      'March',
+                      'April',
+                      'May',
+                      'June',
+                      'July',
+                      'August',
+                      'September',
+                      'October',
+                      'November',
+                      'December',
+                    ];
+                    return `${
+                      months[currentMonth.getMonth()]
+                    } ${currentMonth.getFullYear()}`;
+                  }
+                })()}
               </h3>
               <Button
                 variant="ghost"

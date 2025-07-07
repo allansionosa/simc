@@ -332,3 +332,125 @@
 .tiptap-content .text-justify {
   text-align: justify;
 }
+
+/* Browser Compatibility Fallbacks */
+
+/* CSS Grid fallback for older browsers */
+@supports not (display: grid) {
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .grid-cols-1 > * {
+    flex: 1 1 100%;
+  }
+
+  .grid-cols-2 > * {
+    flex: 1 1 50%;
+  }
+
+  .grid-cols-3 > * {
+    flex: 1 1 33.333333%;
+  }
+
+  .grid-cols-4 > * {
+    flex: 1 1 25%;
+  }
+
+  .grid-cols-7 > * {
+    flex: 1 1 14.285714%;
+  }
+
+  @media (max-width: 768px) {
+    .md\:grid-cols-2 > * {
+      flex: 1 1 100%;
+    }
+
+    .md\:grid-cols-3 > * {
+      flex: 1 1 50%;
+    }
+  }
+}
+
+/* Flexbox fallback for very old browsers */
+@supports not (display: flex) {
+  .flex {
+    display: block;
+  }
+
+  .flex-col {
+    display: block;
+  }
+
+  .items-center {
+    text-align: center;
+  }
+
+  .justify-center {
+    text-align: center;
+  }
+
+  .justify-between {
+    text-align: justify;
+  }
+}
+
+/* Gap fallback for older browsers */
+@supports not (gap: 1rem) {
+  .gap-1 > * + * {
+    margin-left: 0.25rem;
+  }
+
+  .gap-2 > * + * {
+    margin-left: 0.5rem;
+  }
+
+  .gap-4 > * + * {
+    margin-left: 1rem;
+  }
+
+  .gap-8 > * + * {
+    margin-left: 2rem;
+  }
+
+  .space-x-2 > * + * {
+    margin-left: 0.5rem;
+  }
+
+  .space-x-8 > * + * {
+    margin-left: 2rem;
+  }
+}
+
+/* Modern CSS features fallback */
+@supports not (aspect-ratio: 16/9) {
+  .aspect-ratio {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  }
+
+  .aspect-ratio > * {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+/* Print styles for better compatibility */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break {
+    page-break-before: always;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+}

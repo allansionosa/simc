@@ -377,7 +377,7 @@ export default function AppointmentForm({
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full bg-accent hover:bg-accent/90"
+              className="w-full bg-accent hover:bg-accent/90 cursor-pointer"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Booking Appointment...' : 'Schedule Appointment'}

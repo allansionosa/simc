@@ -252,7 +252,7 @@ const DateInput: React.FC<DateInputProps> = ({
         onChange={handleInputChange('month')}
         onKeyDown={handleKeyDown('month')}
         onFocus={(e) => {
-          if (window.innerWidth > 1024) {
+          if (typeof window !== 'undefined' && window.innerWidth > 1024) {
             e.target.select();
           }
         }}
@@ -271,7 +271,7 @@ const DateInput: React.FC<DateInputProps> = ({
         onChange={handleInputChange('day')}
         onKeyDown={handleKeyDown('day')}
         onFocus={(e) => {
-          if (window.innerWidth > 1024) {
+          if (typeof window !== 'undefined' && window.innerWidth > 1024) {
             e.target.select();
           }
         }}
@@ -290,7 +290,7 @@ const DateInput: React.FC<DateInputProps> = ({
         onChange={handleInputChange('year')}
         onKeyDown={handleKeyDown('year')}
         onFocus={(e) => {
-          if (window.innerWidth > 1024) {
+          if (typeof window !== 'undefined' && window.innerWidth > 1024) {
             e.target.select();
           }
         }}
