@@ -46,7 +46,7 @@ export default function Patient() {
         console.error('Error fetching the PDF:', error);
         if (error instanceof Error && error.message === 'PDF_NOT_FOUND') {
           toast(
-            'PDF file is not available in the database yet. Please contact your doctor for more information.'
+            'PDF file is not available in the database yet. Please contact the hospital for more information.'
           );
         } else {
           toast(

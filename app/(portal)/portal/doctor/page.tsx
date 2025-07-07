@@ -8,7 +8,6 @@ import Cookies from 'js-cookie';
 import { doctorRefreshToken, logout } from '@/app/api/auth';
 import { toast } from 'sonner';
 import React from 'react';
-
 import {
   changePassword,
   getDoctorPatientExam,
