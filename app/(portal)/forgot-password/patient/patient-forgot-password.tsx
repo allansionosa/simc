@@ -57,7 +57,7 @@ export function PatientForgotPasswordClient({
       <ResetPasswordForm onSubmit={handleSubmit} loading={isLoading} />
       <CountDown
         countdownStarted={countdownStarted}
-        pushTo="/portal/doctor/login"
+        pushTo="/portal/patient/login"
       />
     </div>
   );

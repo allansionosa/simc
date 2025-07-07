@@ -57,7 +57,7 @@ export default function PatientLogin() {
     } else {
       setIsLoggedIn(false);
     }
-  }, []);
+  }, [access_token, router]);
 
   const handleLogin = async (values: LoginSchema) => {
     try {
@@ -103,7 +103,7 @@ export default function PatientLogin() {
   const handleSubmitForgotPassword = async (values: { email: string }) => {
     try {
       setIsSubmittingForgotPass(true);
-      const response = await forgotPassword(values.email, 'patient');
+      const response = await forgotPassword(values.email);
       toast(response);
       setIsModalOpen(false);
     } catch (err: unknown) {
@@ -126,7 +126,9 @@ export default function PatientLogin() {
   };
 
   return isLoggedIn ? (
-    <Spinner />
+    <div className="flex items-center justify-center h-screen">
+      <Spinner />
+    </div>
   ) : (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-lg">

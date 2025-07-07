@@ -49,7 +49,6 @@ export default function ForgotPassword({
       }}
     >
       <DialogContent className="p-5">
-        {' '}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -74,11 +73,15 @@ export default function ForgotPassword({
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="mt-5"
+                className="mt-5 cursor-pointer"
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={loading} className="mt-5">
+              <Button
+                type="submit"
+                disabled={loading}
+                className="mt-5 cursor-pointer"
+              >
                 {loading ? 'Submitting...' : 'Submit'}
               </Button>
             </DialogFooter>

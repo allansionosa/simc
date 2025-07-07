@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { doctorRefreshToken, logout } from '@/app/api/auth';
 import { toast } from 'sonner';
+import React from 'react';
 
 import {
   changePassword,
@@ -65,7 +66,7 @@ export default function DoctorDashboard() {
   const [doctorRecord, setDataRecord] = useState<DoctorPatient>();
   const access_token = Cookies.get('simc_doctor_access_token');
 
-  const refresh = async () => {
+  const refresh = React.useCallback(async () => {
     try {
       if (access_token) {
         setIsLoading(true);
@@ -79,19 +80,22 @@ export default function DoctorDashboard() {
     } catch (err: unknown) {
       handleApiError(err as ApiError);
     }
-  };
+  }, [access_token, router, setDoctor]);
 
-  const handleApiError = (err: ApiError) => {
-    const errorMessage =
-      err.response?.data ||
-      err.response?.message ||
-      err.message ||
-      'Something went wrong, please try again later';
-    toast(errorMessage);
-    Cookies.remove('simc_doctor_access_token');
-    router.push('/portal/doctor/login');
-    console.log(err);
-  };
+  const handleApiError = React.useCallback(
+    (err: ApiError) => {
+      const errorMessage =
+        err.response?.data ||
+        err.response?.message ||
+        err.message ||
+        'Something went wrong, please try again later';
+      toast(errorMessage);
+      Cookies.remove('simc_doctor_access_token');
+      router.push('/portal/doctor/login');
+      console.log(err);
+    },
+    [router]
+  );
 
   useEffect(() => {
     if (access_token) {
@@ -100,7 +104,7 @@ export default function DoctorDashboard() {
       setIsLoading(true);
       router.push('/portal/doctor/login');
     }
-  }, []);
+  }, [access_token, router]);
 
   const handleLogout = async () => {
     try {
@@ -157,7 +161,7 @@ export default function DoctorDashboard() {
     if (!isLoading) {
       getPatients();
     }
-  }, [isLoading]);
+  }, [isLoading, doctorcode, token]);
 
   const getPatientResults = async (doctorcode: string, patientNo: string) => {
     try {

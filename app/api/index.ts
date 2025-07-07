@@ -34,24 +34,40 @@ export const viewProtectedPdf = async (
   url: string,
   token: string
 ): Promise<void> => {
-  const response = await axios.get(url, {
-    headers: {
-      ...authorizedConfig(token).headers,
-      'Cache-Control': 'no-cache, no-store, must-revalidate',
-      Pragma: 'no-cache',
-      Expires: '0',
-    },
-    responseType: 'blob',
-  });
-  const bloblUrl = window.URL.createObjectURL(response.data);
-  const newWindow = window.open(bloblUrl, '_tab');
-  if (!newWindow) {
-    const link = document.createElement('a');
-    link.href = bloblUrl;
-    link.download = 'protected.pdf';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        ...authorizedConfig(token).headers,
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        Pragma: 'no-cache',
+        Expires: '0',
+      },
+      responseType: 'blob',
+    });
+
+    const bloblUrl = window.URL.createObjectURL(response.data);
+    const newWindow = window.open(bloblUrl, '_tab');
+    if (!newWindow) {
+      const link = document.createElement('a');
+      link.href = bloblUrl;
+      link.download = 'protected.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'response' in error &&
+      error.response &&
+      typeof error.response === 'object' &&
+      'status' in error.response &&
+      error.response.status === 404
+    ) {
+      throw new Error('PDF_NOT_FOUND');
+    }
+    throw error;
   }
 };
 
@@ -98,12 +114,14 @@ export const changePassword = async (
     .then((res) => res.data);
 };
 
-export const forgotPassword = async (
-  email: string,
-  type: string
-): Promise<string> => {
+export const forgotPassword = async (email: string): Promise<string> => {
   return await api
-    .post(`/api/forgot-password/${type}`, email)
+    .post(`/api/forgot-password/patient`, email)
+    .then((res) => res.data);
+};
+export const forgotPasswordDoctor = async (email: string): Promise<string> => {
+  return await api
+    .post(`/api/forgot-password/doctor`, email)
     .then((res) => res.data);
 };
 

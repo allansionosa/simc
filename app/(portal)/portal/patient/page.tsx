@@ -10,6 +10,7 @@ import { logout, refreshToken } from '@/app/api/auth';
 import { toast } from 'sonner';
 import HeadBar from '../../headbar';
 import { Spinner } from '@/components/ui/spinner';
+import React from 'react';
 
 export type PatientExam = {
   id: number;
@@ -37,18 +38,27 @@ export default function Patient() {
   const [isChangingPass, setIsChangingPass] = useState(false);
   const access_token = Cookies.get('simc_patient_access_token');
 
-  const handleViewPDF = async (value: string) => {
-    try {
-      await viewProtectedPdf(value, token);
-    } catch (error) {
-      console.error('Error fetching the PDF:', error);
-      toast(
-        'Error fetching the PDF. Sorry for the inconvenience, please try again later.'
-      );
-    }
-  };
+  const handleViewPDF = React.useCallback(
+    async (value: string) => {
+      try {
+        await viewProtectedPdf(value, token);
+      } catch (error) {
+        console.error('Error fetching the PDF:', error);
+        if (error instanceof Error && error.message === 'PDF_NOT_FOUND') {
+          toast(
+            'PDF file is not available in the database yet. Please contact your doctor for more information.'
+          );
+        } else {
+          toast(
+            'Error fetching the PDF. Sorry for the inconvenience, please try again later.'
+          );
+        }
+      }
+    },
+    [token]
+  );
 
-  const refresh = async () => {
+  const refresh = React.useCallback(async () => {
     try {
       if (access_token) {
         setIsLoading(true);
@@ -77,9 +87,9 @@ export default function Patient() {
       router.push('/portal/patient/login');
       console.log(err);
     }
-  };
+  }, [access_token, router, setUser]);
 
-  const getPatientResults = async () => {
+  const getPatientResults = React.useCallback(async () => {
     try {
       const res = await getPatientExam(patientno, token);
       // Map API response to PatientExam type
@@ -126,7 +136,7 @@ export default function Patient() {
     } finally {
       setIsDataLoading(false);
     }
-  };
+  }, [patientno, token, email]);
 
   useEffect(() => {
     if (access_token) {
@@ -135,13 +145,13 @@ export default function Patient() {
       setIsLoading(true);
       router.push('/portal/patient/login');
     }
-  }, []);
+  }, [access_token, router]);
 
   useEffect(() => {
     if (!isLoading) {
       getPatientResults();
     }
-  }, [isLoading]);
+  }, [isLoading, patientno, token]);
 
   const handleLogout = async () => {
     try {

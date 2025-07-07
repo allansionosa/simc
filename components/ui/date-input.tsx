@@ -1,8 +1,8 @@
 'use client';
 
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import * as React from 'react';
 
 interface DateInputProps {
   value?: Date;
@@ -36,34 +36,49 @@ const DateInput: React.FC<DateInputProps> = ({
   const dayRef = React.useRef<HTMLInputElement | null>(null);
   const yearRef = React.useRef<HTMLInputElement | null>(null);
 
+  // Memoize the onChange callback to prevent unnecessary re-renders
+  const handleDateChange = React.useCallback(
+    (newDate: Date) => {
+      onChange(newDate);
+    },
+    [onChange]
+  );
+
   React.useEffect(() => {
-    const d = value ? new Date(value) : new Date();
-    setDate({
-      day: d.getDate(),
-      month: d.getMonth() + 1,
-      year: d.getFullYear(),
-    });
+    if (value) {
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) {
+        setDate({
+          day: d.getDate(),
+          month: d.getMonth() + 1,
+          year: d.getFullYear(),
+        });
+      }
+    }
   }, [value]);
 
-  const validateDate = (field: keyof DateParts, value: number): boolean => {
-    if (
-      (field === 'day' && (value < 1 || value > 31)) ||
-      (field === 'month' && (value < 1 || value > 12)) ||
-      (field === 'year' && (value < 1000 || value > 9999))
-    ) {
-      return false;
-    }
+  const validateDate = React.useCallback(
+    (field: keyof DateParts, value: number): boolean => {
+      if (
+        (field === 'day' && (value < 1 || value > 31)) ||
+        (field === 'month' && (value < 1 || value > 12)) ||
+        (field === 'year' && (value < 1000 || value > 9999))
+      ) {
+        return false;
+      }
 
-    const newDate = { ...date, [field]: value };
-    const d = new Date(newDate.year, newDate.month - 1, newDate.day);
-    return (
-      d.getFullYear() === newDate.year &&
-      d.getMonth() + 1 === newDate.month &&
-      d.getDate() === newDate.day
-    );
-  };
+      const newDate = { ...date, [field]: value };
+      const d = new Date(newDate.year, newDate.month - 1, newDate.day);
+      return (
+        d.getFullYear() === newDate.year &&
+        d.getMonth() + 1 === newDate.month &&
+        d.getDate() === newDate.day
+      );
+    },
+    [date]
+  );
 
-  const handleInputChange =
+  const handleInputChange = React.useCallback(
     (field: keyof DateParts) => (e: React.ChangeEvent<HTMLInputElement>) => {
       if (disabled) return;
 
@@ -75,33 +90,39 @@ const DateInput: React.FC<DateInputProps> = ({
       setDate(newDate);
 
       if (isValid) {
-        onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        handleDateChange(
+          new Date(newDate.year, newDate.month - 1, newDate.day)
+        );
       }
-    };
+    },
+    [disabled, validateDate, date, handleDateChange]
+  );
 
   const initialDate = React.useRef<DateParts>(date);
 
-  const handleBlur =
+  const handleBlur = React.useCallback(
     (field: keyof DateParts) =>
-    (e: React.FocusEvent<HTMLInputElement>): void => {
-      if (disabled) return;
+      (e: React.FocusEvent<HTMLInputElement>): void => {
+        if (disabled) return;
 
-      if (!e.target.value) {
-        setDate(initialDate.current);
-        return;
-      }
+        if (!e.target.value) {
+          setDate(initialDate.current);
+          return;
+        }
 
-      const newValue = Number(e.target.value);
-      const isValid = validateDate(field, newValue);
+        const newValue = Number(e.target.value);
+        const isValid = validateDate(field, newValue);
 
-      if (!isValid) {
-        setDate(initialDate.current);
-      } else {
-        initialDate.current = { ...date, [field]: newValue };
-      }
-    };
+        if (!isValid) {
+          setDate(initialDate.current);
+        } else {
+          initialDate.current = { ...date, [field]: newValue };
+        }
+      },
+    [disabled, validateDate, date]
+  );
 
-  const handleKeyDown =
+  const handleKeyDown = React.useCallback(
     (field: keyof DateParts) => (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (disabled) return;
 
@@ -152,7 +173,9 @@ const DateInput: React.FC<DateInputProps> = ({
         }
 
         setDate(newDate);
-        onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        handleDateChange(
+          new Date(newDate.year, newDate.month - 1, newDate.day)
+        );
       } else if (e.key === 'ArrowDown') {
         e.preventDefault();
         let newDate = { ...date };
@@ -183,7 +206,9 @@ const DateInput: React.FC<DateInputProps> = ({
         }
 
         setDate(newDate);
-        onChange(new Date(newDate.year, newDate.month - 1, newDate.day));
+        handleDateChange(
+          new Date(newDate.year, newDate.month - 1, newDate.day)
+        );
       }
 
       if (e.key === 'ArrowRight') {
@@ -207,7 +232,9 @@ const DateInput: React.FC<DateInputProps> = ({
           if (field === 'year') dayRef.current?.focus();
         }
       }
-    };
+    },
+    [disabled, date, handleDateChange]
+  );
 
   return (
     <div

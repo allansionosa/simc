@@ -34,14 +34,14 @@ export async function generateMetadata({
 
   if (!job) {
     return {
-      title: 'Job Not Found',
+      title: 'Job Not Found | St. Irenaeus Medical Center Inc.',
       description: 'The requested job position could not be found.',
     };
   }
 
   return {
-    title: `${job.title} - Careers at St. Irenaeus Medical Center`,
-    description: `Apply for the ${job.title} position at St. Irenaeus Medical Center. ${job.location} location, ${job.employmentType} employment type.`,
+    title: `${job.title} | St. Irenaeus Medical Center Inc.`,
+    description: `Apply for the ${job.title} position at St. Irenaeus Medical Center Inc. ${job.location} location, ${job.employmentType} employment type.`,
     keywords: [
       job.title,
       'careers',
@@ -51,11 +51,30 @@ export async function generateMetadata({
       'medical center',
       job.location,
       job.employmentType,
+      'St. Irenaeus',
+      'Philippines',
     ],
     openGraph: {
-      title: `${job.title} - Careers at St. Irenaeus Medical Center`,
-      description: `Apply for the ${job.title} position at St. Irenaeus Medical Center.`,
+      title: `${job.title} | St. Irenaeus Medical Center Inc.`,
+      description: `Apply for the ${job.title} position at St. Irenaeus Medical Center Inc.`,
+      url: `https://your-domain.com/careers/${job.slug}`,
+      siteName: 'St. Irenaeus Medical Center Inc.',
+      images: [
+        {
+          url: 'https://your-domain.com/hiring.jpg',
+          width: 800,
+          height: 600,
+          alt: `Career at St. Irenaeus Medical Center - ${job.title}`,
+        },
+      ],
+      locale: 'en_PH',
       type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${job.title} | St. Irenaeus Medical Center Inc.`,
+      description: `Apply for the ${job.title} position at St. Irenaeus Medical Center Inc.`,
+      images: ['https://your-domain.com/hiring.jpg'],
     },
   };
 }

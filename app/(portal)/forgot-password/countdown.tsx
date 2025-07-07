@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 interface CountdownProps {
   countdownStarted: boolean;
@@ -19,28 +19,41 @@ export default function CountDown({
 }: CountdownProps) {
   const [seconds, setSeconds] = useState(5);
   const router = useRouter();
+  const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout | undefined;
+    // Clear any existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
 
     if (countdownStarted && seconds > 0) {
-      intervalId = setInterval(() => {
-        setSeconds((prevSeconds) => prevSeconds - 1);
+      intervalRef.current = setInterval(() => {
+        setSeconds((prevSeconds) => {
+          if (prevSeconds <= 1) {
+            // Clear interval when reaching 0
+            if (intervalRef.current) {
+              clearInterval(intervalRef.current);
+            }
+            return 0;
+          }
+          return prevSeconds - 1;
+        });
       }, 1000);
     }
 
     return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
       }
     };
-  }, [countdownStarted, seconds]);
+  }, [countdownStarted]);
 
   useEffect(() => {
     if (seconds === 0) {
       router.push(pushTo);
     }
-  }, [seconds]);
+  }, [seconds, router, pushTo]);
 
   return countdownStarted ? (
     <div className="absolute z-10 top-40 right-1/2 translate-x-1/2">

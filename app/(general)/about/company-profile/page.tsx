@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Metadata } from 'next';
 
 export const getCompanyProfile = async (): Promise<CompanyProfile> => {
   const res = await fetch(
@@ -38,6 +39,45 @@ export const getMission = async (): Promise<Mission[]> => {
   });
   if (!res.ok) throw new Error('Failed to fetch data');
   return res.json();
+};
+
+export const metadata: Metadata = {
+  title: 'Company Profile | St. Irenaeus Medical Center Inc.',
+  description:
+    'Discover the vision, mission, and facilities of St. Irenaeus Medical Center Inc. - a modern healthcare facility committed to excellence.',
+  keywords: [
+    'company profile',
+    'vision',
+    'mission',
+    'facilities',
+    'St. Irenaeus Medical Center',
+    'healthcare',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'Company Profile | St. Irenaeus Medical Center Inc.',
+    description:
+      'Discover the vision, mission, and facilities of St. Irenaeus Medical Center Inc. - a modern healthcare facility committed to excellence.',
+    url: 'https://your-domain.com/about/company-profile',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/room1.jpg',
+        width: 800,
+        height: 600,
+        alt: 'St. Irenaeus Medical Center Facilities',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Company Profile | St. Irenaeus Medical Center Inc.',
+    description:
+      'Discover the vision, mission, and facilities of St. Irenaeus Medical Center Inc. - a modern healthcare facility committed to excellence.',
+    images: ['https://your-domain.com/room1.jpg'],
+  },
 };
 
 export default async function CompanyProfile() {

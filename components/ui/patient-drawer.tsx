@@ -5,6 +5,7 @@ import { getColumns } from './columns';
 import { PatientExam } from '@/app/(portal)/portal/patient/page';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { viewProtectedPdf } from '@/app/api';
+import { toast } from 'sonner';
 
 // Define the DoctorPatient type to match what's used in the doctor dashboard
 type DoctorPatient = {
@@ -36,6 +37,15 @@ const PatientDrawer: React.FC<PatientDrawerProps> = ({
       await viewProtectedPdf(value, token);
     } catch (error) {
       console.error('Error fetching the PDF:', error);
+      if (error instanceof Error && error.message === 'PDF_NOT_FOUND') {
+        toast(
+          'PDF file is not available in the database yet. Please contact the hospital for more information.'
+        );
+      } else {
+        toast(
+          'Error fetching the PDF. Sorry for the inconvenience, please try again later.'
+        );
+      }
     }
   };
 

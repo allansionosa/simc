@@ -62,7 +62,7 @@ export default function DoctorLogin() {
     } else {
       setIsLoggedIn(false);
     }
-  }, []);
+  }, [access_token, router]);
 
   const handleLogin = async (values: LoginSchema) => {
     try {
@@ -108,7 +108,7 @@ export default function DoctorLogin() {
   const handleSubmitForgotPassword = async (values: { email: string }) => {
     try {
       setIsSubmittingForgotPass(true);
-      const response = await forgotPassword(values.email, 'doctor');
+      const response = await forgotPassword(values.email);
       toast(response);
       setIsModalOpen(false);
     } catch (err: unknown) {

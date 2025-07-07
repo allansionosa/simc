@@ -1,4 +1,5 @@
 import { getTermsPrivacy } from '@/components/hooks/useTermsPrivacy';
+import { Metadata } from 'next';
 
 export default async function TermsCondition() {
   const terms = await getTermsPrivacy();
@@ -17,3 +18,40 @@ export default async function TermsCondition() {
     </section>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Terms and Conditions | St. Irenaeus Medical Center Inc.',
+  description:
+    'Read the terms and conditions of St. Irenaeus Medical Center Inc. - our policies and guidelines for using our healthcare services.',
+  keywords: [
+    'terms and conditions',
+    'policies',
+    'St. Irenaeus Medical Center',
+    'healthcare',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'Terms and Conditions | St. Irenaeus Medical Center Inc.',
+    description:
+      'Read the terms and conditions of St. Irenaeus Medical Center Inc. - our policies and guidelines for using our healthcare services.',
+    url: 'https://your-domain.com/terms-and-conditions',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/simc_blue.png',
+        width: 800,
+        height: 600,
+        alt: 'Terms and Conditions',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Terms and Conditions | St. Irenaeus Medical Center Inc.',
+    description:
+      'Read the terms and conditions of St. Irenaeus Medical Center Inc. - our policies and guidelines for using our healthcare services.',
+    images: ['https://your-domain.com/simc_blue.png'],
+  },
+};

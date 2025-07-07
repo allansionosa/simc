@@ -2,6 +2,7 @@ import Image from 'next/image';
 import { HeartPulse, Users, ShieldCheck, Stethoscope } from 'lucide-react';
 import { getAbout } from '@/components/hooks/useAbout';
 import { getDoctors } from '@/components/hooks/useDoctor';
+import { Metadata } from 'next';
 
 export default async function AboutPage() {
   const data = await getAbout();
@@ -125,3 +126,41 @@ export default async function AboutPage() {
     </main>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'About Us | St. Irenaeus Medical Center Inc.',
+  description:
+    'Learn about St. Irenaeus Medical Center Inc. - our mission, values, and commitment to providing exceptional healthcare services to our community.',
+  keywords: [
+    'about us',
+    'St. Irenaeus Medical Center',
+    'healthcare',
+    'mission',
+    'values',
+    'Philippines',
+  ],
+  openGraph: {
+    title: 'About Us | St. Irenaeus Medical Center Inc.',
+    description:
+      'Learn about St. Irenaeus Medical Center Inc. - our mission, values, and commitment to providing exceptional healthcare services to our community.',
+    url: 'https://your-domain.com/about/about-us',
+    siteName: 'St. Irenaeus Medical Center Inc.',
+    images: [
+      {
+        url: 'https://your-domain.com/simc_blue.png',
+        width: 800,
+        height: 600,
+        alt: 'About St. Irenaeus Medical Center',
+      },
+    ],
+    locale: 'en_PH',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Us | St. Irenaeus Medical Center Inc.',
+    description:
+      'Learn about St. Irenaeus Medical Center Inc. - our mission, values, and commitment to providing exceptional healthcare services to our community.',
+    images: ['https://your-domain.com/simc_blue.png'],
+  },
+};

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Metadata } from 'next';
 
 export default async function ServiceDetailPage({
   params,
@@ -68,4 +69,40 @@ export default async function ServiceDetailPage({
       </div>
     </main>
   );
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const services = await getServices();
+  const service = services.find((s) => s.slug === params.slug);
+  if (!service) return {};
+  return {
+    title: `${service.title} | St. Irenaeus Medical Center Inc.`,
+    description: service.description,
+    openGraph: {
+      title: `${service.title} | St. Irenaeus Medical Center Inc.`,
+      description: service.description,
+      url: `https://your-domain.com/services/${service.slug}`,
+      siteName: 'St. Irenaeus Medical Center Inc.',
+      images: [
+        {
+          url: `https://your-domain.com${service.image}`,
+          width: 800,
+          height: 600,
+          alt: service.title,
+        },
+      ],
+      locale: 'en_PH',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${service.title} | St. Irenaeus Medical Center Inc.`,
+      description: service.description,
+      images: [`https://your-domain.com${service.image}`],
+    },
+  };
 }
