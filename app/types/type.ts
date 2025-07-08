@@ -213,3 +213,10 @@ type TermsPrivacy = {
   privacyLastModified: string;
   updatedBy: string | null;
 };
+
+type Facilities = {
+  id: number;
+  image: string;
+  title: string;
+  description: string;
+};

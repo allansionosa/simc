@@ -41,6 +41,21 @@ export const getMission = async (): Promise<Mission[]> => {
   return res.json();
 };
 
+export const getFacilities = async (): Promise<Facilities[]> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/about/facilities`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
 export const metadata: Metadata = {
   title: 'Company Profile | St. Irenaeus Medical Center Inc.',
   description:
@@ -84,6 +99,7 @@ export default async function CompanyProfile() {
   const data = await getCompanyProfile();
   const vision = await getVision();
   const missions = await getMission();
+  const facilities = await getFacilities();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -169,20 +185,7 @@ export default async function CompanyProfile() {
           Our Facilities
         </h2>
         <div className="grid md:grid-cols-2 gap-8">
-          {[
-            {
-              title: 'Modern Medical Equipment',
-              description:
-                'We will be equipped with state-of-the-art diagnostic and treatment facilities to provide the best possible care.',
-              image: '/equipment.jpg',
-            },
-            {
-              title: 'Comfortable Patient Rooms',
-              description:
-                'Our patient rooms will be designed for comfort and recovery, featuring modern amenities and a peaceful environment.',
-              image: '/room2.jpg',
-            },
-          ].map((facility, index) => (
+          {facilities.map((facility, index) => (
             <Card
               key={index}
               className="overflow-hidden hover:shadow-lg transition-shadow duration-300 pt-0"
