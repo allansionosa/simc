@@ -15,8 +15,24 @@ const getHMOs = async (): Promise<HMO[]> => {
   return res.json();
 };
 
+const getHMOHeader = async (): Promise<Header> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo/header`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
 export default async function HMOPage() {
   const data = await getHMOs();
+  const header = await getHMOHeader();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -24,21 +40,19 @@ export default async function HMOPage() {
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-accent uppercase font-medium tracking-widest text-base mb-2">
-              Accepted HMO Providers
+              {header.title}{' '}
             </h1>
             <h2 className="font-heading text-3xl md:text-5xl text-primary font-bold mb-4">
-              Partner HMO Companies
+              {header.subTitle}{' '}
             </h2>
             <p className="text-muted text-base md:text-lg mb-6 max-w-xl">
-              We accept a wide range of HMO providers to ensure our patients
-              have access to quality healthcare. Check if your HMO is in our
-              network of accepted providers.
+              {header.description}
             </p>
           </div>
           <div className="flex-1 flex justify-center">
             <Image
-              src="/hmobg.jpg"
-              alt="HMO Partners"
+              src={header.image}
+              alt={`${header.title} Image`}
               width={400}
               height={400}
               className="rounded-xl shadow-lg object-cover"

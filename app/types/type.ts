@@ -220,3 +220,11 @@ type Facilities = {
   title: string;
   description: string;
 };
+
+type Header = {
+  id: string;
+  title: string;
+  subTitle: string;
+  description: string;
+  image: string;
+};

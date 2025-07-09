@@ -3,8 +3,24 @@ import Image from 'next/image';
 import dayjs from 'dayjs';
 import { Metadata } from 'next';
 
+const getNewsHeader = async (): Promise<Header> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/news/header`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
 export default async function NewsPage() {
   const data = await getNews();
+  const header = await getNewsHeader();
   return (
     <main className="bg-surface min-h-screen">
       {/* Hero/Intro */}
@@ -12,21 +28,19 @@ export default async function NewsPage() {
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-accent uppercase font-medium tracking-widest text-base mb-2">
-              News & Updates
+              {header.title}
             </h1>
             <h2 className="font-heading text-3xl md:text-5xl text-primary font-bold mb-4">
-              Better Information, Better Health
+              {header.subTitle}
             </h2>
             <p className="text-muted text-base md:text-lg mb-6 max-w-xl">
-              Stay up to date with the latest news, events, and updates from St.
-              Irenaeus Medical Center Inc. We are committed to keeping our
-              community informed and healthy.
+              {header.description}
             </p>
           </div>
           <div className="flex-1 flex justify-center">
             <Image
-              src="/news1.jpg"
-              alt="News Hero"
+              src={header.image}
+              alt={`${header.title} Image`}
               width={400}
               height={300}
               className="rounded-xl shadow-lg object-cover"

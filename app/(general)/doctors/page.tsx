@@ -2,52 +2,24 @@ import { getDoctors } from '@/components/hooks/useDoctor';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
-// const doctors = [
-//   {
-//     name: 'Dr. Jane Smith',
-//     specialty: 'Cardiologist',
-//     image: '/doctor1.jpg',
-//     description:
-//       'Expert in heart health and cardiovascular care with 15+ years of experience.',
-//   },
-//   {
-//     name: 'Dr. John Doe',
-//     specialty: 'Pediatrician',
-//     image: '/doctor2.jpg',
-//     description:
-//       'Caring for children and adolescents with a focus on holistic wellness.',
-//   },
-//   {
-//     name: 'Dr. Maria Garcia',
-//     specialty: 'Orthopedic Surgeon',
-//     image: '/doctor1.jpg',
-//     description:
-//       'Specialist in bone, joint, and muscle surgery and rehabilitation.',
-//   },
-//   {
-//     name: 'Dr. Alex Lee',
-//     specialty: 'Anesthesiologist',
-//     image: '/doctor2.jpg',
-//     description:
-//       'Ensuring patient safety and comfort during surgical procedures.',
-//   },
-//   {
-//     name: 'Dr. Emily Tan',
-//     specialty: 'Laboratory Medicine',
-//     image: '/doctor1.jpg',
-//     description: 'Providing accurate diagnostics and laboratory services.',
-//   },
-//   {
-//     name: 'Dr. Michael Cruz',
-//     specialty: 'Rehabilitation Medicine',
-//     image: '/doctor2.jpg',
-//     description:
-//       'Helping patients regain strength and mobility after injury or illness.',
-//   },
-// ];
+const getDoctorHeader = async (): Promise<Header> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/doctor/header`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
 
 export default async function DoctorsPage() {
   const doctors = await getDoctors();
+  const header = await getDoctorHeader();
   return (
     <main className="bg-surface min-h-screen">
       {/* Hero/Intro */}
@@ -55,25 +27,23 @@ export default async function DoctorsPage() {
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-accent uppercase font-medium tracking-widest text-base mb-2">
-              Our Doctors
+              {header.title}{' '}
             </h1>
             <h2 className="font-heading text-3xl md:text-5xl text-primary font-bold mb-4">
-              Meet Our Medical Experts
+              {header.subTitle}
             </h2>
             <p className="text-muted text-base md:text-lg mb-6 max-w-xl">
-              Our team of highly qualified doctors is dedicated to providing
-              exceptional care and expertise across a wide range of specialties.
-              Your health is in good hands.
+              {header.description}
             </p>
-            <blockquote className="italic text-accent mt-4">
+            {/* <blockquote className="italic text-accent mt-4">
               “We treat every patient like family.” – Dr. Jane Smith, Chief
               Medical Officer
-            </blockquote>
+            </blockquote> */}
           </div>
           <div className="flex-1 flex justify-center">
             <Image
-              src="/doctors-group.jpg"
-              alt="Our Doctors"
+              src={header.image}
+              alt={`${header.title} Image`}
               width={400}
               height={300}
               className="rounded-xl shadow-lg object-cover"

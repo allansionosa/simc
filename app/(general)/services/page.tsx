@@ -2,29 +2,43 @@ import { getServices } from '@/components/hooks/useServices';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
+const getServicesHeader = async (): Promise<Header> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}/api/services/header`,
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+      },
+      cache: 'no-store',
+    }
+  );
+  if (!res.ok) throw new Error('Failed to fetch data');
+  return res.json();
+};
+
 export default async function ServicesPage() {
   const services = await getServices();
+  const header = await getServicesHeader();
   return (
     <main className="bg-surface min-h-screen">
       <section className="relative w-full bg-gradient-to-r from-sky-100 via-sky-200 to-white py-12 md:py-20">
         <div className="container mx-auto flex flex-col md:flex-row items-center gap-10 px-4">
           <div className="flex-1 text-center md:text-left">
             <h1 className="text-accent uppercase font-medium tracking-widest text-base mb-2">
-              Our Services
+              {header.title}
             </h1>
             <h2 className="font-heading text-3xl md:text-5xl text-primary font-bold mb-4">
-              Care You Can Believe In
+              {header.subTitle}
             </h2>
             <p className="text-muted text-base md:text-lg mb-6 max-w-xl">
-              We offer a comprehensive range of medical services, delivered by
-              expert professionals in a caring and modern environment. Your
-              health and well-being are our top priorities.
+              {header.description}
             </p>
           </div>
           <div className="flex-1 flex justify-center">
             <Image
-              src="/room3.jpg"
-              alt="Hospital Service"
+              src={header.image}
+              alt={`${header.title} Image`}
               width={400}
               height={400}
               className="rounded-xl shadow-lg object-cover"
