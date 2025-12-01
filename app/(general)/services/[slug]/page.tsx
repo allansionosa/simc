@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Stethoscope, Activity } from 'lucide-react';
 import Link from 'next/link';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Metadata } from 'next';
@@ -24,13 +24,21 @@ export default async function ServiceDetailPage({
       <div className="container max-w-4xl mx-auto px-4">
         <Card className="overflow-hidden shadow-xl">
           <CardHeader className="flex flex-col items-center text-center gap-4 pt-8">
-            <Image
-              src={service.logo}
-              alt={service.title}
-              width={72}
-              height={72}
-              className="rounded-md"
-            />
+            <div className="w-12 h-12 mb-2 flex items-center justify-center">
+              {service.slug === 'outpatient-consultation' ? (
+                <Stethoscope className="w-12 h-12 text-primary" />
+              ) : service.slug === 'diagnostic-imaging' ? (
+                <Activity className="w-12 h-12 text-primary" />
+              ) : (
+                <Image
+                  src={service.logo}
+                  alt={service.title}
+                  width={72}
+                  height={72}
+                  className="rounded-md"
+                />
+              )}
+            </div>
             <CardTitle className="text-3xl font-bold text-primary">
               {service.title}
             </CardTitle>
