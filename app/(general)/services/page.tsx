@@ -1,25 +1,40 @@
 import { getServices } from '@/components/hooks/useServices';
 import Image from 'next/image';
 import { Metadata } from 'next';
+import { Stethoscope, Activity } from 'lucide-react';
 
-const getServicesHeader = async (): Promise<Header> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/services/header`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// The API-based services header fetching has been disabled so this page can be
+// fully static. When your API is ready, restore the getServicesHeader function
+// below and switch the component back to using it.
+//
+// const getServicesHeader = async (): Promise<Header> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/services/header`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+const dummyServicesHeader: Header = {
+  id: 'services-header',
+  title: 'Our Services',
+  subTitle: 'Healthcare services at SIMC',
+  description:
+    'Explore some of the key medical services offered by St. Irenaeus Medical Center Inc. (SIMC).',
+  image: '/room3.jpg',
 };
 
 export default async function ServicesPage() {
   const services = await getServices();
-  const header = await getServicesHeader();
+  const header = dummyServicesHeader;
   return (
     <main className="bg-surface min-h-screen">
       <section className="relative w-full bg-gradient-to-r from-sky-100 via-sky-200 to-white py-12 md:py-20">
@@ -57,12 +72,20 @@ export default async function ServicesPage() {
               href={`/services/${service.slug}`}
               className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow flex flex-col items-center text-center p-6 no-underline"
             >
-              <Image
-                src={service.logo}
-                alt={service.title}
-                width={30}
-                height={30}
-              />
+              <div className="w-8 h-8 mb-2 flex items-center justify-center">
+                {service.slug === 'outpatient-consultation' ? (
+                  <Stethoscope className="w-8 h-8 text-primary" />
+                ) : service.slug === 'diagnostic-imaging' ? (
+                  <Activity className="w-8 h-8 text-primary" />
+                ) : (
+                  <Image
+                    src={service.logo}
+                    alt={service.title}
+                    width={30}
+                    height={30}
+                  />
+                )}
+              </div>
               <h3 className="font-heading font-bold text-lg text-primary mb-2">
                 {service.title}
               </h3>

@@ -2,59 +2,112 @@ import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Metadata } from 'next';
 
-export const getCompanyProfile = async (): Promise<CompanyProfile> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/about/company-profile`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// API-based company profile, vision, mission, and facilities fetching is
+// disabled so this page can be fully static. When your API is ready, restore
+// the fetch helpers below and remove the dummy data.
+//
+// export const getCompanyProfile = async (): Promise<CompanyProfile> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/about/company-profile`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+//
+// export const getVision = async (): Promise<Vision> => {
+//   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/vision`, {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//     },
+//     cache: 'no-store',
+//   });
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+//
+// export const getMission = async (): Promise<Mission[]> => {
+//   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mission`, {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//     },
+//     cache: 'no-store',
+//   });
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+//
+// export const getFacilities = async (): Promise<Facilities[]> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/about/facilities`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+const dummyCompanyProfile: CompanyProfile = {
+  id: 1,
+  title: 'St. Irenaeus Medical Center Inc. (SIMC)',
+  subTitle: 'A growing modern healthcare institution',
+  description:
+    'St. Irenaeus Medical Center Inc. (SIMC) is a sample description used while the site is running in static mode. Replace this with the official company profile content later.',
+  image: '/room1.jpg',
 };
 
-export const getVision = async (): Promise<Vision> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/vision`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+const dummyVision: Vision = {
+  id: 1,
+  title: 'Our Vision',
+  description:
+    '<p>To be recognized as a trusted healthcare partner for families in our community.</p>',
+  image: '/room1.jpg',
 };
 
-export const getMission = async (): Promise<Mission[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mission`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
-};
+const dummyMissions: Mission[] = [
+  {
+    id: 1,
+    title: 'Compassionate Care',
+    description: 'Provide compassionate and patient-centered medical services.',
+  },
+  {
+    id: 2,
+    title: 'Excellence',
+    description:
+      'Maintain high standards of clinical quality and safety at SIMC.',
+  },
+];
 
-export const getFacilities = async (): Promise<Facilities[]> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/about/facilities`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
-};
+const dummyFacilities: Facilities[] = [
+  {
+    id: 1,
+    image: '/room1.jpg',
+    title: 'Outpatient Clinic',
+    description:
+      'Comfortable consultation rooms for patients and their families.',
+  },
+  {
+    id: 2,
+    image: '/room3.jpg',
+    title: 'Diagnostic Area',
+    description:
+      'Diagnostic facilities to support accurate and timely medical decisions.',
+  },
+];
 
 export const metadata: Metadata = {
   title: 'Company Profile | St. Irenaeus Medical Center Inc.',
@@ -95,11 +148,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function CompanyProfile() {
-  const data = await getCompanyProfile();
-  const vision = await getVision();
-  const missions = await getMission();
-  const facilities = await getFacilities();
+export default function CompanyProfile() {
+  const data = dummyCompanyProfile;
+  const vision = dummyVision;
+  const missions = dummyMissions;
+  const facilities = dummyFacilities;
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -158,7 +211,7 @@ export default async function CompanyProfile() {
           <h2 className="text-3xl font-bold text-center mb-16 text-primary">
             Our Mission & Values
           </h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 gap-8">
             {missions.map((value) => (
               <Card
                 key={value.id}

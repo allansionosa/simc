@@ -2,24 +2,38 @@ import { getDoctors } from '@/components/hooks/useDoctor';
 import Image from 'next/image';
 import { Metadata } from 'next';
 
-const getDoctorHeader = async (): Promise<Header> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/doctor/header`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// The API-based doctor header fetching has been disabled so this page can be
+// fully static. When your API is ready, restore the getDoctorHeader function
+// below and switch the component back to using it.
+//
+// const getDoctorHeader = async (): Promise<Header> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/doctor/header`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+const dummyDoctorHeader: Header = {
+  id: 'doctor-header',
+  title: 'Our Doctors',
+  subTitle: 'Meet the SIMC medical team',
+  description:
+    'Get to know some of the dedicated doctors serving at St. Irenaeus Medical Center Inc. (SIMC).',
+  image: '/doctors-group.jpg',
 };
 
 export default async function DoctorsPage() {
   const doctors = await getDoctors();
-  const header = await getDoctorHeader();
+  const header = dummyDoctorHeader;
   return (
     <main className="bg-surface min-h-screen">
       {/* Hero/Intro */}

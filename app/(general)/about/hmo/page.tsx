@@ -3,36 +3,67 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Phone, Globe } from 'lucide-react';
 import { Metadata } from 'next';
 
-const getHMOs = async (): Promise<HMO[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// The API-based HMO fetching has been disabled so this page can be fully
+// static. When your API is ready, restore the getHMOs and getHMOHeader
+// functions below and switch the component back to using them.
+//
+// const getHMOs = async (): Promise<HMO[]> => {
+//   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo`, {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//     },
+//     cache: 'no-store',
+//   });
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+//
+// const getHMOHeader = async (): Promise<Header> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo/header`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+const dummyHMOHeader: Header = {
+  id: 'hmo-header',
+  title: 'Accepted HMOs',
+  subTitle: 'Partner health maintenance organizations',
+  description:
+    'St. Irenaeus Medical Center Inc. (SIMC) partners with several HMO providers to make healthcare more accessible.',
+  image: '/hmobg.jpg',
 };
 
-const getHMOHeader = async (): Promise<Header> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/about/hmo/header`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
-};
+const dummyHMOs: HMO[] = [
+  {
+    id: 1,
+    title: 'Intellicare',
+    image: '/intellicare.png',
+    contactNo: '(000) 000-0001',
+    website: 'https://example-hmo.com',
+  },
+  {
+    id: 2,
+    title: 'Maxicare',
+    image: '/maxicare.png',
+    contactNo: '(000) 000-0002',
+    website: 'https://another-hmo.com',
+  },
+];
 
-export default async function HMOPage() {
-  const data = await getHMOs();
-  const header = await getHMOHeader();
+export default function HMOPage() {
+  const data = dummyHMOs;
+  const header = dummyHMOHeader;
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

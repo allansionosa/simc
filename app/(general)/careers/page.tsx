@@ -5,7 +5,7 @@ import Image from 'next/image';
 export const metadata: Metadata = {
   title: 'Careers | St. Irenaeus Medical Center Inc.',
   description:
-    'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
+    'Join our healthcare team at St. Irenaeus Medical Center Inc. (SIMC). Explore open positions and build your future with us.',
   keywords: [
     'careers',
     'jobs',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Careers | St. Irenaeus Medical Center Inc.',
     description:
-      'Join our healthcare team at St. Irenaeus Medical Center. Explore open positions and build your future with us.',
+      'Join our healthcare team at St. Irenaeus Medical Center Inc. (SIMC). Explore open positions and build your future with us.',
     url: 'https://your-domain.com/careers',
     siteName: 'St. Irenaeus Medical Center Inc.',
     images: [
@@ -42,36 +42,93 @@ export const metadata: Metadata = {
   },
 };
 
-export const getCareers = async (): Promise<Careers[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// The API-based data fetching for careers has been commented out temporarily
+// so that this page can be deployed as a fully static page on Vercel.
+// When you are ready to use the API again, restore the functions below
+// and switch the component back to using them.
+
+// export const getCareers = async (): Promise<Careers[]> => {
+//   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//     },
+//     cache: 'no-store',
+//   });
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+// const getCareerHeader = async (): Promise<Header> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/careers/header`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+type DummyHeader = {
+  title: string;
+  subTitle: string;
+  description: string;
+  image: string;
 };
 
-const getCareerHeader = async (): Promise<Header> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/careers/header`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+type DummyJob = Careers;
+
+const dummyHeader: DummyHeader = {
+  title: 'Careers at St. Irenaeus Medical Center Inc. (SIMC)',
+  subTitle: 'Build your medical career with SIMC',
+  description:
+    'St. Irenaeus Medical Center Inc. (SIMC) is looking for compassionate and dedicated professionals who want to grow with our expanding healthcare team.',
+  image: '/appointment.jpg',
 };
 
-export default async function CareersPage() {
-  const jobs = await getCareers();
-  const header = await getCareerHeader();
+const dummyJobs: DummyJob[] = [
+  {
+    id: 1,
+    title: 'Staff Nurse',
+    location: 'St. Irenaeus Medical Center Inc.',
+    slug: 'staff-nurse',
+    description:
+      'Provide high-quality nursing care to patients, coordinate with physicians, and ensure adherence to SIMC healthcare standards.',
+    employmentType: 'Full-time',
+    is_enabled: true,
+  },
+  {
+    id: 2,
+    title: 'Radiologic Technologist',
+    location: 'St. Irenaeus Medical Center Inc.',
+    slug: 'radiologic-technologist',
+    description:
+      'Operate imaging equipment, assist physicians in diagnostic procedures, and maintain safety protocols for patients and staff.',
+    employmentType: 'Full-time',
+    is_enabled: true,
+  },
+  {
+    id: 3,
+    title: 'Medical Technologist',
+    location: 'St. Irenaeus Medical Center Inc.',
+    slug: 'medical-technologist',
+    description:
+      'Perform laboratory tests, analyze results, and support clinicians in providing accurate diagnoses for SIMC patients.',
+    employmentType: 'Full-time',
+    is_enabled: true,
+  },
+];
+
+export default function CareersPage() {
+  const jobs = dummyJobs;
+  const header = dummyHeader;
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center pb-10">
       {/* Hero Section */}

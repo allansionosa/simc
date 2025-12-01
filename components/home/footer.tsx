@@ -9,12 +9,14 @@ const Footer = ({ data }: FooterProps) => (
     <div className="container mx-auto flex flex-col lg:flex-row gap-8 lg:gap-0">
       <div className="flex-1 flex flex-col  lg:items-start mb-6 lg:mb-0">
         <div className="flex  gap-2 mb-2">
-          <Image
-            src={data.logoWhite}
-            alt="St. Irenaeus Medical Center Inc. Logo"
-            width={48}
-            height={48}
-          />
+          {data.logoWhite ? (
+            <Image
+              src={data.logoWhite}
+              alt="St. Irenaeus Medical Center Inc. Logo"
+              width={48}
+              height={48}
+            />
+          ) : null}
           <div>
             <span className="font-heading font-bold text-lg block">
               St. Irenaeus Medical Center Inc.

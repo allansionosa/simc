@@ -1,23 +1,37 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-const getHomeAbout = async (): Promise<HomeBanner[]> => {
-  const res = await fetch(
-    `${[process.env.NEXT_PUBLIC_API_URL]}/api/home/banner`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
-};
+// NOTE:
+// API-based hero banner fetching is disabled for now so the site can be
+// deployed as a static site to Vercel. When your API is ready,
+// restore the fetch logic below and remove the dummy data.
+//
+// const getHomeAbout = async (): Promise<HomeBanner[]> => {
+//   const res = await fetch(
+//     `${[process.env.NEXT_PUBLIC_API_URL]}/api/home/banner`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
 
-export default async function HeroBanner() {
-  const data = await getHomeAbout();
+const dummyHeroBanners: HomeBanner[] = [
+  {
+    id: 1,
+    title: 'St. Irenaeus Medical Center Inc. (SIMC)',
+    subTitle: 'Compassionate care for every family',
+    image: '/room4.jpg',
+  },
+];
+
+export default function HeroBanner() {
+  const data = dummyHeroBanners;
 
   return (
     <div>

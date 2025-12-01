@@ -3,24 +3,38 @@ import Image from 'next/image';
 import dayjs from 'dayjs';
 import { Metadata } from 'next';
 
-const getNewsHeader = async (): Promise<Header> => {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_API_URL}/api/news/header`,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-      },
-      cache: 'no-store',
-    }
-  );
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// The API-based news header fetching has been disabled so this page can be
+// fully static. When your API is ready, restore the getNewsHeader function
+// below and switch the component back to using it.
+//
+// const getNewsHeader = async (): Promise<Header> => {
+//   const res = await fetch(
+//     `${process.env.NEXT_PUBLIC_API_URL}/api/news/header`,
+//     {
+//       headers: {
+//         'Content-Type': 'application/json',
+//         'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//       },
+//       cache: 'no-store',
+//     }
+//   );
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+const dummyNewsHeader: Header = {
+  id: 'news-header',
+  title: 'News & Updates',
+  subTitle: 'Stay informed with SIMC',
+  description:
+    'Get the latest news and updates from St. Irenaeus Medical Center Inc. (SIMC).',
+  image: '/appointment.jpg',
 };
 
 export default async function NewsPage() {
   const data = await getNews();
-  const header = await getNewsHeader();
+  const header = dummyNewsHeader;
   return (
     <main className="bg-surface min-h-screen">
       {/* Hero/Intro */}

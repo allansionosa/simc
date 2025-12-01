@@ -6,12 +6,13 @@ import {
 } from '@/components/ui/accordion';
 import ContactUsForm from '@/components/contact/contact-us-form';
 import { getFaqs } from '@/components/hooks/useFaqs';
-import { Institution } from '@/components/hooks/useInstitution';
+// import { Institution } from '@/components/hooks/useInstitution';
 import { Metadata } from 'next';
+import Map from '@/components/home/map';
 
 export default async function ContactPage() {
   const faqs = await getFaqs();
-  const institution = await Institution();
+  // const institution = await Institution();
 
   return (
     <main className="bg-surface min-h-screen">
@@ -72,15 +73,7 @@ export default async function ContactPage() {
           Find Us
         </h3>
         <div className="w-full h-96 rounded-lg overflow-hidden shadow-lg">
-          <iframe
-            src={institution.addressLink}
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          ></iframe>
+          <Map />
         </div>
       </section>
     </main>

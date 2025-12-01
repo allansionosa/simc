@@ -74,10 +74,11 @@ export default async function ServiceDetailPage({
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const { slug } = await params;
   const services = await getServices();
-  const service = services.find((s) => s.slug === params.slug);
+  const service = services.find((s) => s.slug === slug);
   if (!service) return {};
   return {
     title: `${service.title} | St. Irenaeus Medical Center Inc.`,

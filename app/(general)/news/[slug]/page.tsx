@@ -11,10 +11,11 @@ import type { Metadata } from 'next';
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
+  const { slug } = await params;
   const newsList = await getNews();
-  const news = newsList.find((n) => n.slug === params.slug);
+  const news = newsList.find((n) => n.slug === slug);
   if (!news) return {};
   return {
     title: `${news.title} | St. Irenaeus Medical Center Inc.`,

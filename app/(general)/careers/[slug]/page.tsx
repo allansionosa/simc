@@ -4,16 +4,58 @@ import JobApplicationForm from '@/components/careers/job-application-form';
 import Link from 'next/link';
 import Script from 'next/script';
 
-export const getCareers = async (): Promise<Careers[]> => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-    },
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error('Failed to fetch data');
-  return res.json();
+// NOTE:
+// API-based careers fetching is disabled for now so this page can be fully
+// static. When your API is ready, restore the getCareers implementation below
+// and remove the dummy data.
+//
+// export const getCareers = async (): Promise<Careers[]> => {
+//   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {
+//     headers: {
+//       'Content-Type': 'application/json',
+//       'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
+//     },
+//     cache: 'no-store',
+//   });
+//   if (!res.ok) throw new Error('Failed to fetch data');
+//   return res.json();
+// };
+
+const dummyCareers: Careers[] = [
+  {
+    id: 1,
+    title: 'Staff Nurse',
+    location: 'St. Irenaeus Medical Center Inc.',
+    employmentType: 'Full-time',
+    description:
+      '<p>Provide high-quality nursing care to patients, coordinate with physicians, and ensure adherence to SIMC healthcare standards.</p>',
+    slug: 'staff-nurse',
+    is_enabled: true,
+  },
+  {
+    id: 2,
+    title: 'Radiologic Technologist',
+    location: 'St. Irenaeus Medical Center Inc.',
+    employmentType: 'Full-time',
+    description:
+      '<p>Operate imaging equipment, assist physicians in diagnostic procedures, and maintain safety protocols for patients and staff.</p>',
+    slug: 'radiologic-technologist',
+    is_enabled: true,
+  },
+  {
+    id: 3,
+    title: 'Medical Technologist',
+    location: 'St. Irenaeus Medical Center Inc.',
+    employmentType: 'Full-time',
+    description:
+      '<p>Perform laboratory tests, analyze results, and support clinicians in providing accurate diagnoses for SIMC patients.</p>',
+    slug: 'medical-technologist',
+    is_enabled: true,
+  },
+];
+
+const getCareers = async (): Promise<Careers[]> => {
+  return Promise.resolve(dummyCareers);
 };
 
 export const generateStaticParams = async () => {
