@@ -97,7 +97,7 @@ export default function DoctorLogin() {
     void _values;
     setIsSubmittingForgotPass(true);
     try {
-      toast('Password reset link sent (dummy).');
+      toast('Password reset link sent (sample).');
       setIsModalOpen(false);
     } finally {
       setIsSubmittingForgotPass(false);

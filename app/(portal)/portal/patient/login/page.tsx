@@ -105,7 +105,7 @@ export default function PatientLogin() {
   const handleSubmitForgotPassword = async () => {
     setIsSubmittingForgotPass(true);
     try {
-      toast('Password reset link sent (dummy).');
+      toast('Password reset link sent (sample).');
       setIsModalOpen(false);
     } finally {
       setIsSubmittingForgotPass(false);

@@ -37,19 +37,16 @@ export default function Patient() {
   const [isChangingPass, setIsChangingPass] = useState(false);
   const access_token = Cookies.get('simc_patient_access_token');
 
-  const handleViewPDF = React.useCallback(
-    async (_value: string) => {
-      void _value;
-      try {
-        const newWindow = window.open('/TEST20001479.pdf', '_blank', 'noopener');
-        if (!newWindow) return;
-      } catch (error) {
-        console.error('Error fetching the PDF:', error);
-        toast('Error opening the PDF. Please try again later.');
-      }
-    },
-    []
-  );
+  const handleViewPDF = React.useCallback(async (_value: string) => {
+    void _value;
+    try {
+      const newWindow = window.open('/TEST20001479.pdf', '_blank', 'noopener');
+      if (!newWindow) return;
+    } catch (error) {
+      console.error('Error fetching the PDF:', error);
+      toast('Error opening the PDF. Please try again later.');
+    }
+  }, []);
 
   const getPatientResults = React.useCallback(async () => {
     // Dummy mode: render sample exam results.
@@ -113,7 +110,7 @@ export default function Patient() {
   const handleChangePassword = async (_values: ChangePasswordFormData) => {
     void _values;
     setIsChangingPass(true);
-    toast('Password updated successfully (dummy).');
+    toast('Password updated successfully (sample).');
     setIsChangePass(false);
     setIsChangingPass(false);
   };

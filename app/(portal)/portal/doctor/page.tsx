@@ -82,7 +82,7 @@ export default function DoctorDashboard() {
     void _values;
     // Dummy mode: no backend call.
     setIsChangeingPass(true);
-    toast('Password updated successfully (dummy).');
+    toast('Password updated successfully (sample).');
     setIsChangePass(false);
     setIsChangeingPass(false);
   };
