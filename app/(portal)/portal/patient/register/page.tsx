@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { toast } from 'sonner';
+// import { toast } from 'sonner';
 import {
   Form,
   FormField,
@@ -55,7 +55,17 @@ export default function RegisterPatient() {
     mode: 'onChange',
   });
 
-  const onSubmit = async (values: RegisterSchema) => {
+  // const onSubmit = async (values: RegisterSchema) => {
+  //   setLoading(true);
+  //   try {
+  //     setShowVerifyDialog(true);
+  //     form.reset();
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const onSubmit = async () => {
     setLoading(true);
     try {
       setShowVerifyDialog(true);
@@ -64,7 +74,6 @@ export default function RegisterPatient() {
       setLoading(false);
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
       <div className="w-full max-w-lg bg-white rounded-xl shadow-lg p-8 space-y-6">

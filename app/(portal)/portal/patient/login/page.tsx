@@ -92,7 +92,17 @@ export default function PatientLogin() {
     setIsModalOpen(false);
   };
 
-  const handleSubmitForgotPassword = async (values: { email: string }) => {
+  // const handleSubmitForgotPassword = async (values: { email: string }) => {
+  //   setIsSubmittingForgotPass(true);
+  //   try {
+  //     toast('Password reset link sent (dummy).');
+  //     setIsModalOpen(false);
+  //   } finally {
+  //     setIsSubmittingForgotPass(false);
+  //   }
+  // };
+
+  const handleSubmitForgotPassword = async () => {
     setIsSubmittingForgotPass(true);
     try {
       toast('Password reset link sent (dummy).');
