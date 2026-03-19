@@ -7,8 +7,6 @@ import { usePatientUserActions } from '@/app/store';
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { login } from '@/app/api/auth';
-import { forgotPassword } from '@/app/api';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Form,
@@ -30,8 +28,6 @@ const loginSchema = z.object({
   password: z.string().min(1, { message: 'Please input your password' }),
 });
 type LoginSchema = z.infer<typeof loginSchema>;
-
-type ErrorWithResponse = { response?: { data?: string } };
 
 export default function PatientLogin() {
   const { setUser } = usePatientUserActions();
@@ -60,10 +56,20 @@ export default function PatientLogin() {
   }, [access_token, router]);
 
   const handleLogin = async (values: LoginSchema) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await login(values, 'patient');
-      const { email, patientno, token, access_token } = response;
+      const email = values.email.trim();
+      const allowed = email.toLowerCase().includes('@gmail.com');
+      if (!allowed) {
+        toast('Login allowed only for @gmail.com emails (dummy rule).');
+        return;
+      }
+
+      // Dummy credentials.
+      const patientno = String(2000 + email.length); // must be numeric-ish for demo display
+      const token = 'dummy-patient-token';
+      const access_token = 'dummy-patient-access-token';
+
       setUser(email, patientno, token);
       Cookies.set('simc_patient_access_token', access_token, {
         path: '/',
@@ -72,20 +78,6 @@ export default function PatientLogin() {
       setIsLoggedIn(true);
       form.reset();
       router.push('/portal/patient');
-    } catch (err: unknown) {
-      let errorMsg = 'Something went wrong please try again later';
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'data' in err.response
-      ) {
-        errorMsg = (err as ErrorWithResponse).response?.data || errorMsg;
-      }
-      toast(errorMsg);
-      console.log(err);
     } finally {
       setIsLoading(false);
     }
@@ -101,25 +93,10 @@ export default function PatientLogin() {
   };
 
   const handleSubmitForgotPassword = async (values: { email: string }) => {
+    setIsSubmittingForgotPass(true);
     try {
-      setIsSubmittingForgotPass(true);
-      const response = await forgotPassword(values.email);
-      toast(response);
+      toast('Password reset link sent (dummy).');
       setIsModalOpen(false);
-    } catch (err: unknown) {
-      let errorMsg = 'Something went wrong please try again later';
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'data' in err.response
-      ) {
-        errorMsg = (err as ErrorWithResponse).response?.data || errorMsg;
-      }
-      toast(errorMsg);
-      console.log(err);
     } finally {
       setIsSubmittingForgotPass(false);
     }

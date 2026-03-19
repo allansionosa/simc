@@ -4,7 +4,6 @@ import { DataTable } from '../ui/data-table/data-table';
 import { getColumns } from './columns';
 import { PatientExam } from '@/app/(portal)/portal/patient/page';
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { viewProtectedPdf } from '@/app/api';
 import { toast } from 'sonner';
 
 // Define the DoctorPatient type to match what's used in the doctor dashboard
@@ -29,23 +28,16 @@ const PatientDrawer: React.FC<PatientDrawerProps> = ({
   onClose,
   record,
   patientData,
-  token,
   isLoading,
 }) => {
-  const handleViewPDF = async (value: string) => {
+  const handleViewPDF = async () => {
+    // Dummy mode: always open the same sample PDF.
+    // Using a direct public URL avoids calling protected backend endpoints.
     try {
-      await viewProtectedPdf(value, token);
-    } catch (error) {
-      console.error('Error fetching the PDF:', error);
-      if (error instanceof Error && error.message === 'PDF_NOT_FOUND') {
-        toast(
-          'PDF file is not available in the database yet. Please contact the hospital for more information.'
-        );
-      } else {
-        toast(
-          'Error fetching the PDF. Sorry for the inconvenience, please try again later.'
-        );
-      }
+      const newWindow = window.open('/TEST20001479.pdf', '_blank', 'noopener');
+      if (!newWindow) return;
+    } catch {
+      toast('Error opening the PDF. Please try again later.');
     }
   };
 

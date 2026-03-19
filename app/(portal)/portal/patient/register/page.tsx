@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { registerPatient } from '@/app/api';
 import { toast } from 'sonner';
 import {
   Form,
@@ -59,23 +58,8 @@ export default function RegisterPatient() {
   const onSubmit = async (values: RegisterSchema) => {
     setLoading(true);
     try {
-      await registerPatient({ ...values, middlename: values.middlename ?? '' });
       setShowVerifyDialog(true);
       form.reset();
-    } catch (err: unknown) {
-      let errorMsg = 'Something went wrong. Please try again.';
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'data' in err.response
-      ) {
-        errorMsg =
-          (err as { response?: { data?: string } }).response?.data || errorMsg;
-      }
-      toast(errorMsg);
     } finally {
       setLoading(false);
     }

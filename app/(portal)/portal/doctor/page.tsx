@@ -5,14 +5,8 @@ import PatientDrawer from '@/components/ui/patient-drawer';
 import { useDoctor, useDoctorActions } from '@/app/store';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
-import { doctorRefreshToken, logout } from '@/app/api/auth';
 import { toast } from 'sonner';
 import React from 'react';
-import {
-  changePassword,
-  getDoctorPatientExam,
-  getDoctorsPatient,
-} from '@/app/api';
 import { getDoctorColumns } from '@/components/ui/data-table/doctor-columns';
 import { Spinner } from '@/components/ui/spinner';
 import HeadBar from '../../headbar';
@@ -28,6 +22,7 @@ type PatientExam = {
   id: number;
   examination: string;
   dateReleased: string;
+  resultdate?: string;
   file: string;
   patientNumber: number;
   patientName: string;
@@ -40,17 +35,9 @@ type ChangePasswordFormData = {
   confirmPassword: string;
 };
 
-type ApiError = {
-  response?: {
-    data?: string;
-    message?: string;
-  };
-  message?: string;
-};
-
 export default function DoctorDashboard() {
   const [isLoading, setIsLoading] = useState(true);
-  const { email, doctorcode, token } = useDoctor();
+  const { email, doctorcode } = useDoctor();
   const [isChangePass, setIsChangePass] = useState(false);
   const [isChangeingPass, setIsChangeingPass] = useState(false);
   const { setDoctor } = useDoctorActions();
@@ -65,54 +52,22 @@ export default function DoctorDashboard() {
   const [doctorRecord, setDataRecord] = useState<DoctorPatient>();
   const access_token = Cookies.get('simc_doctor_access_token');
 
-  const refresh = React.useCallback(async () => {
-    try {
-      if (access_token) {
-        setIsLoading(true);
-        const response = await doctorRefreshToken(access_token);
-        const { email, doctorcode, token } = response;
-        setDoctor(email, doctorcode, token);
-        setIsLoading(false);
-      } else {
-        router.push('/portal/doctor/login');
-      }
-    } catch (err: unknown) {
-      handleApiError(err as ApiError);
-    }
-  }, [access_token, router, setDoctor]);
-
-  const handleApiError = React.useCallback(
-    (err: ApiError) => {
-      const errorMessage =
-        err.response?.data ||
-        err.response?.message ||
-        err.message ||
-        'Something went wrong, please try again later';
-      toast(errorMessage);
-      Cookies.remove('simc_doctor_access_token');
-      router.push('/portal/doctor/login');
-      console.log(err);
-    },
-    [router]
-  );
-
   useEffect(() => {
-    if (access_token) {
-      refresh();
-    } else {
+    if (!access_token) {
       setIsLoading(true);
       router.push('/portal/doctor/login');
+      return;
     }
+
+    // Dummy mode: token refresh is disabled.
+    setIsLoading(false);
   }, [access_token, router]);
 
   const handleLogout = async () => {
-    try {
-      await logout('doctor');
-      Cookies.remove('simc_doctor_access_token');
-      router.push('/portal/doctor/login');
-    } catch (err: unknown) {
-      handleApiError(err as ApiError);
-    }
+    // Dummy mode: clear session cookie only.
+    Cookies.remove('simc_doctor_access_token');
+    setDoctor('', '', '');
+    router.push('/portal/doctor/login');
   };
 
   const handleOpenChangePass = () => {
@@ -123,86 +78,68 @@ export default function DoctorDashboard() {
     setIsChangePass(false);
   };
 
-  const handleChangePassword = async (values: ChangePasswordFormData) => {
-    try {
-      setIsChangeingPass(true);
-      const payload = {
-        currentPass: values.currentPass,
-        newPass: values.newPass,
-        email: email,
-      };
-      const response = await changePassword(payload, 'doctor', token);
-      toast(response);
-      setIsChangePass(false);
-    } catch (err: unknown) {
-      handleApiError(err as ApiError);
-    } finally {
-      setIsChangeingPass(false);
-    }
-  };
-
-  const getPatients = async () => {
-    try {
-      const res = await getDoctorsPatient(doctorcode, token);
-      const data = res.map((item) => ({
-        key: String(item.id),
-        ...item,
-      }));
-      setFilteredDoctorPatient(data);
-    } catch (err: unknown) {
-      handleApiError(err as ApiError);
-    } finally {
-      setIsDataLoading(false);
-    }
+  const handleChangePassword = async (_values: ChangePasswordFormData) => {
+    void _values;
+    // Dummy mode: no backend call.
+    setIsChangeingPass(true);
+    toast('Password updated successfully (dummy).');
+    setIsChangePass(false);
+    setIsChangeingPass(false);
   };
 
   useEffect(() => {
-    if (!isLoading) {
-      getPatients();
-    }
-  }, [isLoading, doctorcode, token]);
+    if (isLoading) return;
 
-  const getPatientResults = async (doctorcode: string, patientNo: string) => {
-    try {
-      const res = await getDoctorPatientExam(doctorcode, patientNo, token);
-      // Map API response to PatientExam type to match the expected structure
-      const data: PatientExam[] = (Array.isArray(res) ? res : []).map(
-        (item: unknown) => {
-          if (item && typeof item === 'object') {
-            const obj = item as Record<string, unknown>;
-            return {
-              id: Number(obj.id),
-              examination: String(obj.examination),
-              dateReleased: String(obj.dateReleased || obj.resultdate || ''),
-              file: String(obj.file || obj.filename || ''),
-              patientNumber: Number(obj.patientNumber || patientNo),
-              patientName: String(obj.patientName || ''),
-              key: String(obj.id),
-            };
-          }
-          // fallback for unexpected item
-          return {
-            id: 0,
-            examination: '',
-            dateReleased: '',
-            file: '',
-            patientNumber: 0,
-            patientName: '',
-            key: '0',
-          };
-        }
-      );
-      setPatientData(data);
-    } catch (err: unknown) {
-      handleApiError(err as ApiError);
-    } finally {
-      setIsDataLoading(false);
-      setIsPatientDataLoading(false);
-    }
+    // Dummy patients list.
+    const data: DoctorPatient[] = [
+      { id: 1, patientno: '1001', patientname: 'John Patient', key: '1' },
+      { id: 2, patientno: '1002', patientname: 'Mary Patient', key: '2' },
+      { id: 3, patientno: '1003', patientname: 'Alex Patient', key: '3' },
+    ];
+
+    setFilteredDoctorPatient(data);
+    setIsDataLoading(false);
+  }, [isLoading]);
+
+  const getPatientResults = async (
+    _doctorcode: string,
+    patientNo: string,
+    patientName: string
+  ) => {
+    // Dummy mode: generate sample results for the selected patient.
+    setIsPatientDataLoading(true);
+    const pn = Number(patientNo);
+
+    const data: PatientExam[] = [
+      {
+        id: 1,
+        examination: 'Complete Blood Count (CBC)',
+        dateReleased: '2026-03-01',
+        // `columns.tsx` looks for `resultdate`, so include it for display.
+        resultdate: '2026-03-01',
+        file: 'dummy-cbc.pdf',
+        patientNumber: pn,
+        patientName,
+        key: '1',
+      },
+      {
+        id: 2,
+        examination: 'Urinalysis (UA)',
+        dateReleased: '2026-03-05',
+        resultdate: '2026-03-05',
+        file: 'dummy-ua.pdf',
+        patientNumber: pn,
+        patientName,
+        key: '2',
+      },
+    ];
+
+    setPatientData(data);
+    setIsPatientDataLoading(false);
   };
 
   const handleOpenDrawer = (record: DoctorPatient) => {
-    getPatientResults(doctorcode, record.patientno);
+    getPatientResults(doctorcode, record.patientno, record.patientname);
     setIsDrawerOpen(true);
     setDataRecord(record);
   };
@@ -237,7 +174,7 @@ export default function DoctorDashboard() {
             record={doctorRecord}
             patientData={patientData}
             isLoading={isPatientDataLoading}
-            token={token}
+            token="dummy-token"
           />
         </>
       ) : (

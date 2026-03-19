@@ -7,8 +7,6 @@ import { useDoctorActions } from '@/app/store';
 import Cookies from 'js-cookie';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { doctorLogin } from '@/app/api/auth';
-import { forgotPassword } from '@/app/api';
 import { Spinner } from '@/components/ui/spinner';
 import {
   Form,
@@ -31,12 +29,6 @@ const loginSchema = z.object({
 });
 
 type LoginSchema = z.infer<typeof loginSchema>;
-
-type ErrorWithResponse = {
-  response?: {
-    data?: string;
-  };
-};
 
 export default function DoctorLogin() {
   const { setDoctor } = useDoctorActions();
@@ -65,10 +57,20 @@ export default function DoctorLogin() {
   }, [access_token, router]);
 
   const handleLogin = async (values: LoginSchema) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await doctorLogin(values);
-      const { email, doctorcode, token, access_token } = response;
+      const email = values.email.trim();
+      const allowed = email.toLowerCase().includes('@gmail.com');
+      if (!allowed) {
+        toast('Login allowed only for @gmail.com emails (dummy rule).');
+        return;
+      }
+
+      // Dummy credentials.
+      const doctorcode = 'DOC-001';
+      const token = 'dummy-doctor-token';
+      const access_token = 'dummy-doctor-access-token';
+
       setDoctor(email, doctorcode, token);
       Cookies.set('simc_doctor_access_token', access_token, {
         path: '/',
@@ -77,20 +79,6 @@ export default function DoctorLogin() {
       setIsLoggedIn(true);
       form.reset();
       router.push('/portal/doctor');
-    } catch (err: unknown) {
-      let errorMsg = 'Something went wrong please try again later';
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'data' in err.response
-      ) {
-        errorMsg = (err as ErrorWithResponse).response?.data || errorMsg;
-      }
-      toast(errorMsg);
-      console.log(err);
     } finally {
       setIsLoading(false);
     }
@@ -105,25 +93,12 @@ export default function DoctorLogin() {
     setIsModalOpen(false);
   };
 
-  const handleSubmitForgotPassword = async (values: { email: string }) => {
+  const handleSubmitForgotPassword = async (_values: { email: string }) => {
+    void _values;
+    setIsSubmittingForgotPass(true);
     try {
-      setIsSubmittingForgotPass(true);
-      const response = await forgotPassword(values.email);
-      toast(response);
+      toast('Password reset link sent (dummy).');
       setIsModalOpen(false);
-    } catch (err: unknown) {
-      let errorMsg = 'Something went wrong please try again later';
-      if (
-        err &&
-        typeof err === 'object' &&
-        'response' in err &&
-        err.response &&
-        typeof err.response === 'object' &&
-        'data' in err.response
-      ) {
-        errorMsg = (err as ErrorWithResponse).response?.data || errorMsg;
-      }
-      toast(errorMsg);
     } finally {
       setIsSubmittingForgotPass(false);
     }
