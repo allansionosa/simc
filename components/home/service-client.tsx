@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Stethoscope, Activity } from 'lucide-react';
+import { ServiceCategoryIcon } from '@/components/services/service-category-icon';
 
 export default function ServiceClient({ data }: { data: Services[] }) {
   const [selected, setSelected] = useState(0);
@@ -25,32 +25,13 @@ export default function ServiceClient({ data }: { data: Services[] }) {
               onClick={() => setSelected(idx)}
               aria-pressed={selected === idx}
             >
-              <div className="w-8 h-8 mx-auto mb-2 flex items-center justify-center">
-                {service.slug === 'outpatient-consultation' ? (
-                  <Stethoscope
-                    className={`w-8 h-8 ${
-                      selected === idx ? 'text-white' : 'text-primary'
-                    }`}
-                  />
-                ) : service.slug === 'diagnostic-imaging' ? (
-                  <Activity
-                    className={`w-8 h-8 ${
-                      selected === idx ? 'text-white' : 'text-primary'
-                    }`}
-                  />
-                ) : (
-                  <Image
-                    src={service.logo}
-                    alt={service.title}
-                    width={32}
-                    height={32}
-                    className={`w-full h-full object-contain ${
-                      selected === idx
-                        ? 'filter brightness-0 invert'
-                        : 'filter brightness-0 saturate-100 invert-[0.2] sepia-[1]  hue-rotate-[200deg]'
-                    }`}
-                  />
-                )}
+              <div className="mx-auto mb-2 flex h-8 w-8 items-center justify-center">
+                <ServiceCategoryIcon
+                  slug={service.slug}
+                  className={`h-8 w-8 ${
+                    selected === idx ? 'text-white' : 'text-primary'
+                  }`}
+                />
               </div>
               <span
                 className={`icon font-sans text-base ${

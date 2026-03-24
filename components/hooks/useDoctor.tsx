@@ -15,25 +15,17 @@
 //   return res.json();
 // };
 
-const dummyDoctors: Doctors[] = [
-  {
-    id: 1,
-    name: 'Dr. Juan Dela Cruz',
-    image: '/doctor2.jpg',
-    specialties: 'Internal Medicine',
-    description:
-      'Experienced internist at St. Irenaeus Medical Center Inc. (SIMC) dedicated to holistic patient care.',
-  },
-  {
-    id: 2,
-    name: 'Dr. Maria Santos',
-    image: '/doctor1.jpg',
-    specialties: 'Pediatrics',
-    description:
-      'Pediatric specialist providing compassionate care to children and families at SIMC.',
-  },
-];
+import { getPublicDoctorsDirectory } from '@/components/hmo-approval/accredited-doctors';
 
 export const getDoctors = async (): Promise<Doctors[]> => {
-  return Promise.resolve(dummyDoctors);
+  const directory = getPublicDoctorsDirectory();
+  return directory.map((d, index) => ({
+    id: index + 1,
+    publicId: d.id,
+    name: d.name,
+    image: d.image,
+    specialties: d.specialty,
+    description: d.description,
+    accreditedHmos: d.accreditedHmos,
+  }));
 };

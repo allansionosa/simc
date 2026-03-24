@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { HeartPulse, Users, ShieldCheck, Stethoscope } from 'lucide-react';
 import { getAbout } from '@/components/hooks/useAbout';
 import { getDoctors } from '@/components/hooks/useDoctor';
@@ -7,6 +8,7 @@ import { Metadata } from 'next';
 export default async function AboutPage() {
   const data = await getAbout();
   const doctors = await getDoctors();
+  const leadershipPreview = doctors.slice(0, 3);
   return (
     <main className="bg-surface min-h-screen">
       <section className="relative w-full bg-gradient-to-r from-sky-100 via-sky-200 to-white py-12 md:py-20">
@@ -84,11 +86,18 @@ export default async function AboutPage() {
       {/* Meet Our Team */}
       <section className="container mx-auto py-12 px-4">
         <h3 className="text-center text-accent uppercase font-medium tracking-widest mb-2">
-          Meet Our Leadership
+          Meet Our Team
         </h3>
+        <p className="text-center text-muted text-sm max-w-lg mx-auto mb-8">
+          A snapshot of our clinical team. View the full roster and specialties
+          on our doctors page.
+        </p>
         <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
-          {doctors.map((doctor, i) => (
-            <div className="flex flex-col items-center" key={i}>
+          {leadershipPreview.map((doctor) => (
+            <div
+              className="flex flex-col items-center"
+              key={doctor.publicId ?? doctor.id}
+            >
               <Image
                 src={doctor.image}
                 alt={doctor.name}
@@ -96,13 +105,23 @@ export default async function AboutPage() {
                 height={120}
                 className="rounded-full object-cover shadow"
               />
-              <span className="font-heading font-bold text-primary mt-2">
+              <span className="font-heading font-bold text-primary mt-2 text-center max-w-[220px]">
                 {doctor.name}
               </span>
-              <span className="text-muted text-sm">{doctor.specialties}</span>
+              <span className="text-muted text-sm text-center">
+                {doctor.specialties}
+              </span>
             </div>
           ))}
         </div>
+        <p className="text-center mt-8">
+          <Link
+            href="/doctors"
+            className="text-accent font-semibold underline-offset-4 hover:underline"
+          >
+            View all doctors
+          </Link>
+        </p>
       </section>
 
       {/* Call to Action */}

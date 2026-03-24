@@ -15,6 +15,14 @@ type About = {
   image: string;
 };
 
+type ServiceOffering = {
+  id: string;
+  title: string;
+  description: string;
+  /** Short scheduling or access note, e.g. "By appointment" */
+  note?: string;
+};
+
 type Services = {
   id: number;
   image: string;
@@ -22,6 +30,10 @@ type Services = {
   title: string;
   description: string;
   slug: string;
+  /** Longer intro shown on the service detail page */
+  detailIntro?: string;
+  /** Clinics, specialties, or modalities under this service category */
+  offerings?: ServiceOffering[];
 };
 
 type News = {
@@ -76,6 +88,10 @@ type Doctors = {
   image: string;
   specialties: string;
   description: string;
+  /** Matches HMO approval form doctor ids when present */
+  publicId?: string;
+  /** HMO plans this physician is accredited with (static directory) */
+  accreditedHmos?: string[];
 };
 
 type Vision = {
@@ -107,6 +123,10 @@ type HmoApproval = {
   email: string;
   contactNo: string;
   hmoProvider: string;
+  /** Display name + specialty for the selected or entered physician */
+  attendingPhysician: string;
+  /** Present when a listed accredited physician was chosen */
+  doctorId?: string | null;
   company: string | null;
   healthCard: string;
   validId: string;
