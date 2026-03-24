@@ -34,7 +34,7 @@ import { getNews } from '../hooks/useNews';
 // ];
 
 export default async function News() {
-  const data = await getNews();
+  const data = (await getNews()).slice(0, 4);
 
   return (
     <section className="container mx-auto px-2 sm:px-4 py-8">
@@ -47,7 +47,7 @@ export default async function News() {
       <div className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto">
         {data.map((news, idx) => (
           <div
-            key={idx}
+            key={news.slug}
             className="bg-white rounded-xl shadow hover:shadow-lg transition-shadow overflow-hidden flex flex-col md:flex-row h-full"
           >
             <div className="relative w-full h-40 md:w-48 md:h-auto flex-shrink-0">
@@ -69,7 +69,7 @@ export default async function News() {
               </div>
               <div>
                 <Link
-                  href={`news/${news.slug}`}
+                  href={`/news/${news.slug}`}
                   className="text-accent text-sm font-medium hover:underline"
                 >
                   Learn More

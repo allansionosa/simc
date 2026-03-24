@@ -36,6 +36,46 @@ const dummyNews: News[] = [
     image: '/room1.jpg',
     addedDate: '2025-01-15',
   },
+  {
+    id: 3,
+    title: 'Expanded Diagnostic Hours',
+    slug: 'expanded-diagnostic-hours',
+    description:
+      'Updated schedules for imaging and laboratory services to better serve working families.',
+    type: 'Announcement',
+    image: '/room3.jpg',
+    addedDate: '2025-02-01',
+  },
+  {
+    id: 4,
+    title: 'Flu Season Reminders',
+    slug: 'flu-season-reminders',
+    description:
+      'What to know before your visit during peak respiratory season, including masking and triage.',
+    type: 'Health tip',
+    image: '/appointment.jpg',
+    addedDate: '2025-02-10',
+  },
+  {
+    id: 5,
+    title: 'HMO Partners: What’s New',
+    slug: 'hmo-partners-update',
+    description:
+      'A quick look at accepted plans and how to verify coverage before your appointment.',
+    type: 'News',
+    image: '/room1.jpg',
+    addedDate: '2025-02-20',
+  },
+  {
+    id: 6,
+    title: 'Volunteer & Outreach Day',
+    slug: 'volunteer-outreach-day',
+    description:
+      'Thank you to everyone who joined our community screening and education event.',
+    type: 'Community',
+    image: '/room3.jpg',
+    addedDate: '2025-03-01',
+  },
 ];
 
 export const getNews = async (): Promise<News[]> => {

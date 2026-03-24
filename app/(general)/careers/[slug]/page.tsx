@@ -1,25 +1,16 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import JobApplicationForm from '@/components/careers/job-application-form';
-import Link from 'next/link';
 import Script from 'next/script';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { MapPin } from 'lucide-react';
+import { SiteBreadcrumb } from '@/components/site-breadcrumb';
 
 // NOTE:
-// API-based careers fetching is disabled for now so this page can be fully
-// static. When your API is ready, restore the getCareers implementation below
-// and remove the dummy data.
-//
-// export const getCareers = async (): Promise<Careers[]> => {
-//   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/careers`, {
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'x-api-key': `${process.env.NEXT_PUBLIC_API_KEY}`,
-//     },
-//     cache: 'no-store',
-//   });
-//   if (!res.ok) throw new Error('Failed to fetch data');
-//   return res.json();
-// };
+// API-based careers fetching is disabled for static deployment.
+// When your API is ready, restore getCareers and remove dummy data.
 
 const dummyCareers: Careers[] = [
   {
@@ -60,7 +51,7 @@ const getCareers = async (): Promise<Careers[]> => {
 
 export const generateStaticParams = async () => {
   const careers = await getCareers();
-  return careers.map((career) => ({
+  return careers.filter((c) => c.is_enabled).map((career) => ({
     slug: career.slug,
   }));
 };
@@ -130,16 +121,15 @@ export default async function JobPage({
   const careers = await getCareers();
   const job = careers.find((career) => career.slug === slug);
 
-  if (!job) {
+  if (!job || !job.is_enabled) {
     notFound();
   }
 
-  // Structured data for job posting
   const structuredData = {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
     title: job.title,
-    description: job.description.replace(/<[^>]*>/g, ''), // Remove HTML tags
+    description: job.description.replace(/<[^>]*>/g, ''),
     hiringOrganization: {
       '@type': 'Organization',
       name: 'St. Irenaeus Medical Center',
@@ -152,44 +142,68 @@ export default async function JobPage({
     },
     employmentType: job.employmentType,
     datePosted: new Date().toISOString(),
-    validThrough: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+    validThrough: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <main className="bg-surface min-h-screen">
       <Script
         id="job-structured-data"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumb Navigation */}
-        <nav className="mb-6" aria-label="Breadcrumb">
-          <ol className="flex items-center space-x-2 text-sm text-gray-600">
-            <li>
-              <Link href="/" className="hover:text-primary transition-colors">
-                Home
-              </Link>
-            </li>
-            <li className="text-gray-400">/</li>
-            <li>
-              <Link
-                href="/careers"
-                className="hover:text-primary transition-colors"
-              >
-                Careers
-              </Link>
-            </li>
-            <li className="text-gray-400">/</li>
-            <li className="text-gray-900 font-medium">{job.title}</li>
-          </ol>
-        </nav>
+      <SiteBreadcrumb
+        maxWidthClassName="max-w-4xl"
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Careers', href: '/careers' },
+          { label: job.title },
+        ]}
+      />
 
-        <div className="max-w-4xl mx-auto">
+      <div className="container mx-auto max-w-4xl px-4 py-10 md:py-12">
+        <header className="mb-8">
+          <h1 className="font-heading mb-4 text-3xl font-bold text-primary md:text-4xl">
+            {job.title}
+          </h1>
+          <div className="flex flex-wrap items-center gap-3 text-sm">
+            <span className="inline-flex items-center gap-1.5 text-foreground/85">
+              <MapPin className="h-4 w-4 shrink-0 text-secondary" />
+              {job.location}
+            </span>
+            <Badge variant="secondary" className="font-normal">
+              {job.employmentType}
+            </Badge>
+          </div>
+        </header>
+
+        <Card className="mb-10 border-border/80 shadow-sm">
+          <CardHeader className="pb-2">
+            <CardTitle className="font-heading text-lg text-primary">
+              Role overview
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div
+              className="tiptap-content prose prose-neutral max-w-none text-pretty text-foreground/90 [&_p]:mb-3 [&_p:last-child]:mb-0"
+              dangerouslySetInnerHTML={{ __html: job.description }}
+            />
+          </CardContent>
+        </Card>
+
+        <Separator className="mb-10" />
+
+        <section aria-labelledby="apply-heading">
+          <h2
+            id="apply-heading"
+            className="font-heading mb-6 text-xl font-semibold text-primary"
+          >
+            Apply online
+          </h2>
           <JobApplicationForm jobTitle={job.title} />
-        </div>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

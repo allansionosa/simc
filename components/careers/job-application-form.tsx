@@ -101,40 +101,40 @@ export default function JobApplicationForm({
 
   if (submitSuccess) {
     return (
-      <Card className="shadow-lg border border-green-200 bg-green-50">
-        <CardContent className="pt-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-green-800 mb-4">
-              Application Submitted!
-            </h2>
-            <p className="text-green-700 mb-6">
-              Thank you for applying for the {jobTitle} position. We will review
-              your application and contact you soon.
-            </p>
-            <Button
-              onClick={() => {
-                setSubmitSuccess(false);
-                form.reset();
-                form.setValue('jobPosition', jobTitle);
-              }}
-              className="bg-green-600 hover:bg-green-700"
-            >
-              Submit Another Application
-            </Button>
-          </div>
+      <Card className="border border-emerald-200/80 bg-emerald-50/80 shadow-sm">
+        <CardContent className="pt-8 pb-8 text-center">
+          <h2 className="font-heading mb-3 text-2xl font-bold text-primary">
+            Application received
+          </h2>
+          <p className="text-muted mb-8 max-w-md mx-auto text-sm leading-relaxed">
+            Thank you for applying for the {jobTitle} position. Our HR team will
+            review your submission and contact you if your profile matches our
+            needs.
+          </p>
+          <Button
+            onClick={() => {
+              setSubmitSuccess(false);
+              form.reset();
+              form.setValue('jobPosition', jobTitle);
+            }}
+            className="bg-accent hover:bg-accent/90"
+          >
+            Submit another application
+          </Button>
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="shadow-lg border border-gray-200">
+    <Card className="border-border/80 shadow-sm">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-primary">
-          Apply for {jobTitle}
+        <CardTitle className="font-heading text-xl text-primary">
+          Application form
         </CardTitle>
-        <p className="text-gray-600">
-          Please fill out the form below to submit your application.
+        <p className="text-muted text-sm leading-relaxed">
+          Complete the fields below. Your position is pre-filled; attach a
+          current resume or CV (PDF or image, max 500KB).
         </p>
       </CardHeader>
       <CardContent>
@@ -222,7 +222,7 @@ export default function JobApplicationForm({
                       ref={ref}
                     />
                   </FormControl>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-muted text-xs">
                     Only jpg, png, or pdf files. Max size 500KB.
                   </p>
                   <FormMessage />
@@ -231,11 +231,11 @@ export default function JobApplicationForm({
             />
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-accent hover:bg-accent/90"
               disabled={loading}
               size="lg"
             >
-              {loading ? 'Submitting...' : 'Submit Application'}
+              {loading ? 'Submitting…' : 'Submit application'}
             </Button>
           </form>
         </Form>

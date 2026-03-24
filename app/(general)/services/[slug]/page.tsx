@@ -11,14 +11,8 @@ import {
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import {
-  ArrowLeft,
-  ChevronRight,
-  CalendarCheck,
-  Phone,
-  CheckCircle2,
-  Home,
-} from 'lucide-react';
+import { ArrowLeft, ChevronRight, CalendarCheck, Phone, CheckCircle2 } from 'lucide-react';
+import { SiteBreadcrumb } from '@/components/site-breadcrumb';
 import { ServiceCategoryIcon } from '@/components/services/service-category-icon';
 import Link from 'next/link';
 import { Metadata } from 'next';
@@ -36,41 +30,13 @@ export default async function ServiceDetailPage({
 
   return (
     <main className="bg-surface min-h-screen">
-      <div className="border-b border-border/70 bg-white/90 backdrop-blur-sm">
-        <nav
-          aria-label="Breadcrumb"
-          className="container mx-auto max-w-6xl px-4 py-4"
-        >
-          <ol className="flex flex-wrap items-center gap-1.5 text-sm text-muted">
-            <li className="flex items-center gap-1.5">
-              <Link
-                href="/"
-                className="inline-flex items-center gap-1 text-foreground/80 underline-offset-4 hover:text-accent hover:underline"
-              >
-                <Home className="h-4 w-4 shrink-0" aria-hidden />
-                Home
-              </Link>
-            </li>
-            <li aria-hidden className="text-muted/70">
-              /
-            </li>
-            <li>
-              <Link
-                href="/services"
-                className="text-foreground/80 underline-offset-4 hover:text-accent hover:underline"
-              >
-                Services
-              </Link>
-            </li>
-            <li aria-hidden className="text-muted/70">
-              /
-            </li>
-            <li className="font-medium text-primary" aria-current="page">
-              {service.title}
-            </li>
-          </ol>
-        </nav>
-      </div>
+      <SiteBreadcrumb
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Services', href: '/services' },
+          { label: service.title },
+        ]}
+      />
 
       <section className="relative overflow-hidden border-b border-border/60 bg-gradient-to-br from-sky-50 via-white to-sky-100/70">
         <div className="container mx-auto max-w-6xl px-4 py-10 md:py-14">

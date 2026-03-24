@@ -81,11 +81,29 @@
 }
 
 @layer base {
+  /* Cross-browser: prevent mobile font scaling quirks; standard property + WebKit */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+    /* Fallback for older browsers; dvh fixes mobile browser chrome (iOS/Android) */
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Responsive media (avoid overflow); leave inline SVG/icons to components */
+  img,
+  video {
+    display: block;
+    max-width: 100%;
+    height: auto;
   }
 }
 .rdp-vhidden {
