@@ -117,7 +117,10 @@ export default async function NewsPage({
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-primary/55 via-transparent to-transparent" />
                     <div className="absolute left-3 top-3">
-                      <Badge variant="secondary" className="font-normal shadow-sm">
+                      <Badge
+                        variant="secondary"
+                        className="font-normal shadow-sm"
+                      >
                         {news.type}
                       </Badge>
                     </div>
